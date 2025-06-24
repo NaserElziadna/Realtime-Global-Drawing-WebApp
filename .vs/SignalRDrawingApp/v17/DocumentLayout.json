@@ -1,0 +1,105 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\Naser\\source\\repos\\SignalRDrawingApp\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{B4EE16D5-4E64-4F66-85D9-08EB6134E37D}|SignalRDrawingApp\\SignalRDrawingApp.csproj|c:\\users\\naser\\source\\repos\\signalrdrawingapp\\signalrdrawingapp\\views\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{B4EE16D5-4E64-4F66-85D9-08EB6134E37D}|SignalRDrawingApp\\SignalRDrawingApp.csproj|solutionrelative:signalrdrawingapp\\views\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B4EE16D5-4E64-4F66-85D9-08EB6134E37D}|SignalRDrawingApp\\SignalRDrawingApp.csproj|c:\\users\\naser\\source\\repos\\signalrdrawingapp\\signalrdrawingapp\\wwwroot\\css\\site.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}",
+      "RelativeMoniker": "D:0:0:{B4EE16D5-4E64-4F66-85D9-08EB6134E37D}|SignalRDrawingApp\\SignalRDrawingApp.csproj|solutionrelative:signalrdrawingapp\\wwwroot\\css\\site.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B4EE16D5-4E64-4F66-85D9-08EB6134E37D}|SignalRDrawingApp\\SignalRDrawingApp.csproj|c:\\users\\naser\\source\\repos\\signalrdrawingapp\\signalrdrawingapp\\views\\home\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{B4EE16D5-4E64-4F66-85D9-08EB6134E37D}|SignalRDrawingApp\\SignalRDrawingApp.csproj|solutionrelative:signalrdrawingapp\\views\\home\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B4EE16D5-4E64-4F66-85D9-08EB6134E37D}|SignalRDrawingApp\\SignalRDrawingApp.csproj|c:\\users\\naser\\source\\repos\\signalrdrawingapp\\signalrdrawingapp\\wwwroot\\js\\canvas.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
+      "RelativeMoniker": "D:0:0:{B4EE16D5-4E64-4F66-85D9-08EB6134E37D}|SignalRDrawingApp\\SignalRDrawingApp.csproj|solutionrelative:signalrdrawingapp\\wwwroot\\js\\canvas.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B4EE16D5-4E64-4F66-85D9-08EB6134E37D}|SignalRDrawingApp\\SignalRDrawingApp.csproj|c:\\users\\naser\\source\\repos\\signalrdrawingapp\\signalrdrawingapp\\wwwroot\\js\\site.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
+      "RelativeMoniker": "D:0:0:{B4EE16D5-4E64-4F66-85D9-08EB6134E37D}|SignalRDrawingApp\\SignalRDrawingApp.csproj|solutionrelative:signalrdrawingapp\\wwwroot\\js\\site.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 1,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "site.css",
+              "DocumentMoniker": "C:\\Users\\Naser\\source\\repos\\SignalRDrawingApp\\SignalRDrawingApp\\wwwroot\\css\\site.css",
+              "RelativeDocumentMoniker": "SignalRDrawingApp\\wwwroot\\css\\site.css",
+              "ToolTip": "C:\\Users\\Naser\\source\\repos\\SignalRDrawingApp\\SignalRDrawingApp\\wwwroot\\css\\site.css",
+              "RelativeToolTip": "SignalRDrawingApp\\wwwroot\\css\\site.css",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
+              "WhenOpened": "2025-06-24T13:23:18.086Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "_Layout.cshtml",
+              "DocumentMoniker": "C:\\Users\\Naser\\source\\repos\\SignalRDrawingApp\\SignalRDrawingApp\\Views\\Shared\\_Layout.cshtml",
+              "RelativeDocumentMoniker": "SignalRDrawingApp\\Views\\Shared\\_Layout.cshtml",
+              "ToolTip": "C:\\Users\\Naser\\source\\repos\\SignalRDrawingApp\\SignalRDrawingApp\\Views\\Shared\\_Layout.cshtml",
+              "RelativeToolTip": "SignalRDrawingApp\\Views\\Shared\\_Layout.cshtml",
+              "ViewState": "AgIAACgAAAAAAAAAAAAAADgAAAAHAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-06-24T13:21:47.767Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "canvas.js",
+              "DocumentMoniker": "C:\\Users\\Naser\\source\\repos\\SignalRDrawingApp\\SignalRDrawingApp\\wwwroot\\js\\canvas.js",
+              "RelativeDocumentMoniker": "SignalRDrawingApp\\wwwroot\\js\\canvas.js",
+              "ToolTip": "C:\\Users\\Naser\\source\\repos\\SignalRDrawingApp\\SignalRDrawingApp\\wwwroot\\js\\canvas.js",
+              "RelativeToolTip": "SignalRDrawingApp\\wwwroot\\js\\canvas.js",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
+              "WhenOpened": "2025-06-24T13:19:09.838Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "site.js",
+              "DocumentMoniker": "C:\\Users\\Naser\\source\\repos\\SignalRDrawingApp\\SignalRDrawingApp\\wwwroot\\js\\site.js",
+              "RelativeDocumentMoniker": "SignalRDrawingApp\\wwwroot\\js\\site.js",
+              "ToolTip": "C:\\Users\\Naser\\source\\repos\\SignalRDrawingApp\\SignalRDrawingApp\\wwwroot\\js\\site.js",
+              "RelativeToolTip": "SignalRDrawingApp\\wwwroot\\js\\site.js",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
+              "WhenOpened": "2025-06-24T13:18:58.671Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "C:\\Users\\Naser\\source\\repos\\SignalRDrawingApp\\SignalRDrawingApp\\Views\\Home\\Index.cshtml",
+              "RelativeDocumentMoniker": "SignalRDrawingApp\\Views\\Home\\Index.cshtml",
+              "ToolTip": "C:\\Users\\Naser\\source\\repos\\SignalRDrawingApp\\SignalRDrawingApp\\Views\\Home\\Index.cshtml",
+              "RelativeToolTip": "SignalRDrawingApp\\Views\\Home\\Index.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAGAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-06-24T13:17:25.867Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
