@@ -544,3 +544,42 @@ dropArea.addEventListener('drop', (event) => {
 });
 
 $('#help-modal').modal({ show: true });
+
+let userName = null;
+
+$(document).ready(function () {
+    $('#loginModal').modal('show');
+    $('#userName').focus();
+    $('#joinRoom').on('click', function () {
+        const name = $('#userName').val().trim();
+        if (name) {
+            userName = name;
+            connection.invoke('JoinRoom', userName);
+            $('#loginModal').modal('hide');
+            // Notify chat.js
+            window.dispatchEvent(new CustomEvent('userNameSet', { detail: userName }));
+        } else {
+            $('#userName').addClass('is-invalid');
+        }
+    });
+    $('#userName').on('keypress', function (e) {
+        if (e.which === 13) $('#joinRoom').click();
+    });
+});
+
+// Prevent drawing until user has joined
+function canDraw() {
+    return !!userName;
+}
+
+// Example: block drawing if not joined
+canvas.addEventListener('mousedown', function (e) {
+    if (!canDraw()) {
+        e.preventDefault();
+        return false;
+    }
+}, true);
+
+connection.on('updateUserCount', function (count) {
+    document.getElementById('userCount').innerText = count + ' user(s)';
+});

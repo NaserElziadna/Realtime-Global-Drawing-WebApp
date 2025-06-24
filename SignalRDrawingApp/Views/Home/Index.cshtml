@@ -2,6 +2,26 @@
     ViewData["Title"] = "Home Page";
 }
 
+<!-- Login Modal -->
+<div class="modal fade" id="loginModal" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Welcome to Drawing Room</h5>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="userName">Please enter your name:</label>
+                    <input type="text" class="form-control" id="userName" required>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="joinRoom">Join Room</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <canvas id="whiteboard">Sorry, your browser does not support HTML5 canvas technology.</canvas>
 <div class="btn-toolbar overlay-top-left d-flex flex-nowrap" role="toolbar">
     <div class="btn-group mr-2 shadow" role="group">
@@ -92,3 +112,33 @@
         </div>
     </div>
 </div>
+
+<div id="global-chat" style="position:fixed; left:0; top:0; bottom:0; width:320px; background:#222; color:#fff; z-index:1050; display:flex; flex-direction:column;">
+    <div style="padding:10px; background:#111; font-weight:bold;">Global Chat</div>
+    <div id="chat-messages" style="flex:1; overflow-y:auto; padding:10px;"></div>
+    <div style="padding:10px; border-top:1px solid #333;">
+        <form id="chat-form" style="display:flex;">
+            <input id="chat-input" type="text" class="form-control" placeholder="Type a message..." autocomplete="off" style="flex:1; margin-right:5px;">
+            <button class="btn btn-primary" type="submit">Send</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Show the login modal on page load
+    $(document).ready(function () {
+        $('#loginModal').modal('show');
+    });
+
+    // Join room button click event
+    $('#joinRoom').click(function () {
+        var userName = $('#userName').val().trim();
+        if (userName) {
+            // TODO: Handle joining the room with the entered user name
+            $('#loginModal').modal('hide');
+        } else {
+            alert('Please enter your name');
+        }
+    });
+</script>
+<script src="~/js/chat.js"></script>
