@@ -6,8 +6,8 @@ const connection = new signalR.HubConnectionBuilder()
 
 // Start the SignalR connection
 connection.start().then(() => {
-    // Optionally, request the board state from the server if needed
-    // connection.invoke('SendBoard', ...);
+    // Request the board state from the server after connecting
+    connection.invoke('SendBoard');
 }).catch(err => console.error(err.toString()));
 
 var canvas = document.getElementById("whiteboard");
@@ -41,14 +41,17 @@ let penColour = '#f8f9fa';
 
 var scale = 1;
 
+var canvasWidth = canvas.width;
+var canvasHeight = canvas.height;
+
 
 // The scaled width of the screen (ie not the pixels)
 function xUnitsScaled() {
-    return canvas.clientWidth / scale;
+    return canvasWidth / scale;
 }
 // The scaled height of the screen (ie not the pixels)
 function yUnitsScaled() {
-    return canvas.clientHeight / scale;
+    return canvasHeight / scale;
 }
 
 document.addEventListener('keydown', event => {
@@ -74,8 +77,8 @@ document.addEventListener('wheel', (event) => {
     const scaleAmount = -deltaY / 500;
     scale = scale * (1 + scaleAmount);
 
-    var distX = event.pageX / canvas.clientWidth;
-    var distY = event.pageY / canvas.clientHeight;
+    var distX = event.pageX / canvasWidth;
+    var distY = event.pageY / canvasHeight;
 
     const unitsZoomedX = xUnitsScaled() * scaleAmount;
     const unitsZoomedY = yUnitsScaled() * scaleAmount;
@@ -168,8 +171,8 @@ function onTouchMove(evt) {
         // Get the relative position of the middle of the zoom.
         // 0, 0 would be top left. 
         // 0, 1 would be top right etc.
-        var zoomRatioX = midX / canvas.clientWidth;
-        var zoomRatioY = midY / canvas.clientHeight;
+        var zoomRatioX = midX / canvasWidth;
+        var zoomRatioY = midY / canvasHeight;
 
         const unitsZoomedX = xUnitsScaled() * scaleAmount;
         const unitsZoomedY = yUnitsScaled() * scaleAmount;
@@ -382,7 +385,13 @@ function toTrueY(yScreen) {
 // socket.on('drawing', onDrawingEvent);
 connection.on('stroke', onStrokeEvent);
 connection.on('strokes', onStrokesEvent);
-connection.on('board', onHistoryEvent);
+connection.on('board', function(board) {
+    // Expecting board to be an array of strokes
+    if (Array.isArray(board)) {
+        strokeHistory = board.map(x => x.data ? x.data : x); // handle both {data:...} and direct
+        redraw();
+    }
+});
 connection.on('delete', onUndoStrokeEvent);
 connection.on('cursormove', onOtherCursorMove);
 connection.on('backgroundcolour', onBackgroundColourChange);
@@ -454,8 +463,10 @@ function onHistoryEvent(drawHistory) {
     redraw();
 }
 function redraw() {
-    canvas.width = document.body.clientWidth; //document.width is obsolete
-    canvas.height = document.body.clientHeight; //document.height is obsolete
+    canvasWidth = document.body.clientWidth; //document.width is obsolete
+    canvasHeight = document.body.clientHeight; //document.height is obsolete
+    canvas.width = canvasWidth;
+    canvas.height = canvasHeight;
     // Set Background Colour
     context.fillStyle = backgroundColour;
     context.fillRect(0, 0, canvas.width, canvas.height);
