@@ -1,5 +1,6 @@
 // Global Chat Logic (separate from drawing logic)
 let chatUserName = null;
+let chatVisible = true; // Track chat visibility state
 
 const chatConnection = new signalR.HubConnectionBuilder()
     .withUrl("/chatHub")
@@ -13,9 +14,28 @@ function getUserName() {
 
 function appendMessage(user, message) {
     const msgDiv = document.createElement('div');
+    msgDiv.className = 'chat-message';
     msgDiv.innerHTML = `<span style='color:#6cf;font-weight:bold;'>${user}:</span> <span>${message}</span>`;
     document.getElementById('chat-messages').appendChild(msgDiv);
     document.getElementById('chat-messages').scrollTop = document.getElementById('chat-messages').scrollHeight;
+}
+
+// Toggle chat sidebar visibility
+function toggleChat() {
+    const appContainer = document.querySelector('.app-container');
+    const chatToggleIcon = document.getElementById('chat-toggle-icon');
+    
+    if (chatVisible) {
+        // Hide chat
+        appContainer.classList.add('chat-hidden');
+        chatToggleIcon.textContent = '❯';
+    } else {
+        // Show chat
+        appContainer.classList.remove('chat-hidden');
+        chatToggleIcon.textContent = '❮';
+    }
+    
+    chatVisible = !chatVisible;
 }
 
 // Receive chat message
@@ -95,6 +115,12 @@ document.addEventListener('DOMContentLoaded', function () {
             sendChatMessage();
             return false;
         });
+    }
+    
+    // Set up chat toggle button
+    const chatToggleBtn = document.getElementById('chat-toggle');
+    if (chatToggleBtn) {
+        chatToggleBtn.addEventListener('click', toggleChat);
     }
 });
 

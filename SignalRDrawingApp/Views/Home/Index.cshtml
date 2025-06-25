@@ -22,36 +22,15 @@
     </div>
 </div>
 
-<canvas id="whiteboard">Sorry, your browser does not support HTML5 canvas technology.</canvas>
-<div class="btn-toolbar overlay-top-left d-flex flex-nowrap" role="toolbar">
-    <div class="btn-group mr-2 shadow" role="group">
-        <button type="button" class="btn btn-dark" onclick="setColour('#343a40')">&nbsp;</button>
-        <button type="button" class="btn btn-light" onclick="setColour('#f8f9fa')">&nbsp;</button>
-        <button type="button" class="btn btn-danger" onclick="setColour('#dc3545')">&nbsp;</button>
-        <button type="button" class="btn btn-orange" onclick="setColour('#fd7e14')">&nbsp;</button>
-        <button type="button" class="btn btn-warning" onclick="setColour('#ffc107')">&nbsp;</button>
-        <button type="button" class="btn btn-success" onclick="setColour('#28a745')">&nbsp;</button>
-        <button type="button" class="btn btn-primary" onclick="setColour('#007bff')">&nbsp;</button>
-        <button type="button" class="btn btn-indigo" onclick="setColour('#6610f2')">&nbsp;</button>
-    </div>
-</div>
-<div class="btn-toolbar overlay-top-right d-flex flex-nowrap" role="toolbar">
-    <div class="btn-group" role="group">
-        <div class="btn btn-secondary shadow" id="userCount" title="Users in this room"></div>
-    </div>
-</div>
-<div class="btn-toolbar overlay-bottom-right d-flex flex-nowrap" role="toolbar">
-    <button class="btn btn-dark text-light shadow mr-2" onclick="toggleDark()"
-            title="Whiteboard / Blackboard">
-        💡
-    </button>
-    <button class="btn btn-light shadow mr-2" onclick="undoLast()" title="Undo (Ctrl + Z)">&#8634;</button>
-    <button class="btn btn-light shadow mr-2" onclick="copyUrl()" title="Copy room URL">Copy URL</button>
-</div>
-<div class="btn-toolbar overlay-bottom-left d-flex flex-nowrap" role="toolbar">
-    <button class="btn btn-light shadow mr-2" onclick="download()" title="Download current board">💾</button>
+<div class="app-container">
+    <!-- Canvas Area -->
+    <partial name="_CanvasPartial" />
+    
+    <!-- Chat Sidebar -->
+    <partial name="_ChatPartial" />
 </div>
 
+<!-- File Saved Modal -->
 <div class="modal fade" id="file-saved-modal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -74,6 +53,7 @@
     </div>
 </div>
 
+<!-- Help Modal -->
 <div class="modal fade" id="help-modal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -90,17 +70,14 @@
                             <tr>
                                 <td class="font-weight-bold">Drawing</td>
                                 <td>🖱️ Left click / ☝️ Single-finger-touch</td>
-
                             </tr>
                             <tr>
                                 <td class="font-weight-bold">Moving</td>
                                 <td>🖱️ Right click / ✌️ Two-finger-touch</td>
-
                             </tr>
                             <tr>
                                 <td class="font-weight-bold">Zooming</td>
                                 <td>🖱️ Scroll wheel / 🤏 Pinch</td>
-
                             </tr>
                         </tbody>
                     </table>
@@ -113,22 +90,6 @@
     </div>
 </div>
 
-<!-- Make sure this part exists in your Index.cshtml -->
-<div id="global-chat" style="position:fixed; right:0; top:0; bottom:0; width:320px; background:#222; color:#fff; z-index:1050; display:flex; flex-direction:column;">
-    <div style="padding:10px; background:#111; font-weight:bold; display:flex; justify-content:space-between;">
-        <span>Global Chat</span>
-        <span id="chatUserCount">0 👥</span>
-    </div>
-    <div id="chat-messages" style="flex:1; overflow-y:auto; padding:10px;"></div>
-    <div style="padding:10px; border-top:1px solid #333;">
-        <form id="chat-form" style="display:flex;" onsubmit="return false;">
-            <input id="chat-input" type="text" class="form-control" placeholder="Type a message..." autocomplete="off" style="flex:1; margin-right:5px;">
-            <button class="btn btn-primary" type="button" id="send-message">Send</button>
-        </form>
-    </div>
-</div>
-
-<!-- Remove this script section as it's now handled in canvas.js -->
 <script>
     // Show the login modal on page load
     $(document).ready(function () {
@@ -139,8 +100,13 @@
     $('#joinRoom').click(function () {
         var userName = $('#userName').val().trim();
         if (userName) {
-            // TODO: Handle joining the room with the entered user name
+            window.userName = userName;
+            localStorage.setItem('userName', userName);
+            connection.invoke('JoinRoom', userName);
             $('#loginModal').modal('hide');
+            
+            // Notify chat.js
+            window.dispatchEvent(new CustomEvent('userNameSet', { detail: userName }));
         } else {
             alert('Please enter your name');
         }

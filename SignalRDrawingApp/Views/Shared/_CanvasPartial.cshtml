@@ -1,0 +1,32 @@
+<div class="canvas-container">
+    <canvas id="whiteboard">Sorry, your browser does not support HTML5 canvas technology.</canvas>
+    
+    <div class="btn-toolbar overlay-top-left d-flex flex-nowrap" role="toolbar">
+        <div class="btn-group mr-2 shadow" role="group">
+            <button type="button" class="btn btn-dark" onclick="setColour('#343a40')">&nbsp;</button>
+            <button type="button" class="btn btn-light" onclick="setColour('#f8f9fa')">&nbsp;</button>
+            <button type="button" class="btn btn-danger" onclick="setColour('#dc3545')">&nbsp;</button>
+            <button type="button" class="btn btn-orange" onclick="setColour('#fd7e14')">&nbsp;</button>
+            <button type="button" class="btn btn-warning" onclick="setColour('#ffc107')">&nbsp;</button>
+            <button type="button" class="btn btn-success" onclick="setColour('#28a745')">&nbsp;</button>
+            <button type="button" class="btn btn-primary" onclick="setColour('#007bff')">&nbsp;</button>
+            <button type="button" class="btn btn-indigo" onclick="setColour('#6610f2')">&nbsp;</button>
+        </div>
+    </div>
+    
+    <div class="btn-toolbar overlay-top-right d-flex flex-nowrap" role="toolbar">
+        <div class="btn-group" role="group">
+            <div class="btn btn-secondary shadow" id="userCount" title="Users in this room"></div>
+        </div>
+    </div>
+    
+    <div class="btn-toolbar overlay-bottom-right d-flex flex-nowrap" role="toolbar">
+        <button class="btn btn-dark text-light shadow mr-2" onclick="toggleDark()" title="Whiteboard / Blackboard">💡</button>
+        <button class="btn btn-light shadow mr-2" onclick="undoLast()" title="Undo (Ctrl + Z)">&#8634;</button>
+        <button class="btn btn-light shadow mr-2" onclick="copyUrl()" title="Copy room URL">Copy URL</button>
+    </div>
+    
+    <div class="btn-toolbar overlay-bottom-left d-flex flex-nowrap" role="toolbar">
+        <button class="btn btn-light shadow mr-2" onclick="download()" title="Download current board">💾</button>
+    </div>
+</div>
