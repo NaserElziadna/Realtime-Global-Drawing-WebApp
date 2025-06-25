@@ -9,12 +9,10 @@
     <link rel="stylesheet" href="~/SignalRDrawingApp.styles.css" asp-append-version="true" />
 </head>
 <body>
-   
-            @RenderBody()
-        
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @RenderBody()
+
+
     @await RenderSectionAsync("Scripts", required: false)
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
             integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
@@ -23,6 +21,8 @@
             integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx"
             crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js" crossorigin="anonymous"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="~/js/canvas.js"></script>
+    <script src="~/js/chat.js"></script>
 </body>
 </html>

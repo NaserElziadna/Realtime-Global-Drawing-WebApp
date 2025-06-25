@@ -13,6 +13,7 @@ namespace SignalRDrawingApp.Hubs
         public override async Task OnConnectedAsync()
         {
             await base.OnConnectedAsync();
+            await SendBoard();
         }
 
         public async Task SendStroke(object stroke)
@@ -45,9 +46,9 @@ namespace SignalRDrawingApp.Hubs
             await Clients.Others.SendAsync("backgroundcolour", data);
         }
 
-        public async Task SendBoard(object board)
+        public async Task SendBoard()
         {
-            await Clients.Caller.SendAsync("board", board);
+            await Clients.Caller.SendAsync("board", BoardHistory);
         }
 
         public async Task JoinRoom(string userName)
