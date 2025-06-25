@@ -414,10 +414,23 @@ function onDrawingEvent(data) {
     drawLine((data.x0 + offsetX) * scale, (data.y0 + offsetY) * scale, (data.x1 + offsetX) * scale, (data.y1 + offsetY) * scale, data.colour);
 }
 var connectedUsers = 0;
+function updateUserCount(count) {
+    const userCountElement = document.getElementById('userCount');
+    if (userCountElement) {
+        userCountElement.innerHTML = `${count} 👥`;
+    }
+}
+
+connection.on('updateUserCount', function (count) {
+    updateUserCount(count);
+});
+
+// Replace the existing onUsersChanged function
 function onUsersChanged(data) {
     connectedUsers = data;
-    document.getElementById('userCount').innerHTML = `${connectedUsers}👤`
+    updateUserCount(data);
 }
+
 function onDisconnect(data) {
     const dot = document.getElementById(data);
     if (!dot) return;
@@ -547,6 +560,7 @@ $('#help-modal').modal({ show: true });
 
 let userName = null;
 
+// In the section where you handle the login modal
 $(document).ready(function () {
     $('#loginModal').modal('show');
     $('#userName').focus();
@@ -554,8 +568,10 @@ $(document).ready(function () {
         const name = $('#userName').val().trim();
         if (name) {
             userName = name;
+            localStorage.setItem('userName', userName);
             connection.invoke('JoinRoom', userName);
             $('#loginModal').modal('hide');
+            
             // Notify chat.js
             window.dispatchEvent(new CustomEvent('userNameSet', { detail: userName }));
         } else {

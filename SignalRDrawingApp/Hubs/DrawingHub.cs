@@ -53,10 +53,8 @@ namespace SignalRDrawingApp.Hubs
 
         public async Task JoinRoom(string userName)
         {
-            ConnectedUsers.TryAdd(Context.ConnectionId, userName);
-            await Clients.Others.SendAsync("userJoined", userName);
-            await Clients.Caller.SendAsync("board", BoardHistory);
-            await UpdateUserCount();
+            ConnectedUsers[Context.ConnectionId] = userName;
+            await Clients.All.SendAsync("updateUserCount", ConnectedUsers.Count);
         }
 
         public override async Task OnDisconnectedAsync(Exception exception)
@@ -64,14 +62,10 @@ namespace SignalRDrawingApp.Hubs
             if (ConnectedUsers.TryRemove(Context.ConnectionId, out string userName))
             {
                 await Clients.Others.SendAsync("userLeft", userName);
-                await UpdateUserCount();
+                await Clients.All.SendAsync("updateUserCount", ConnectedUsers.Count);
+                await Clients.All.SendAsync("UpdateUserList", ConnectedUsers.Values);
             }
             await base.OnDisconnectedAsync(exception);
-        }
-
-        private async Task UpdateUserCount()
-        {
-            await Clients.All.SendAsync("updateUserCount", ConnectedUsers.Count);
         }
     }
 }
