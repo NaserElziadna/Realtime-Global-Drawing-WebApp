@@ -80,10 +80,11 @@ body {
   margin-right: 5px;
 }
 
+/* Update the chat toggle button positioning */
 .chat-toggle {
   position: absolute;
-  left: -40px;
   top: 10px;
+  right: 320px; /* Position it next to the sidebar */
   z-index: 1051;
   border-radius: 4px 0 0 4px;
   padding: 8px 12px;
@@ -91,7 +92,17 @@ body {
   background-color: #007bff;
   color: white;
   border: none;
-  transition: left 0.3s ease-in-out;
+  transition: right 0.3s ease-in-out;
+}
+
+/* Update the chat hidden state */
+.app-container.chat-hidden .chat-sidebar {
+  transform: translateX(100%); /* Move it off-screen to the right */
+  width: 0; /* Ensure it takes no space when hidden */
+}
+
+.app-container.chat-hidden .chat-toggle {
+  right: 0; /* Move toggle button to the edge when chat is hidden */
 }
 
 .chat-message {
@@ -166,14 +177,4 @@ html {
   color: #fff;
   background-color: #6610f2;
   border-color: #6610f2;
-}
-
-
-/* Add this to your existing CSS */
-.app-container.chat-hidden .chat-sidebar {
-  display: none;
-}
-
-.app-container.chat-hidden .chat-toggle {
-  left: 0;
 }

@@ -36,6 +36,17 @@ function toggleChat() {
     }
     
     chatVisible = !chatVisible;
+    
+    // Force a redraw of the canvas to ensure it fills the available space
+    setTimeout(() => {
+        // Trigger window resize event to make canvas redraw
+        window.dispatchEvent(new Event('resize'));
+        
+        // Also explicitly call the redraw function from canvas.js if available
+        if (typeof redraw === 'function') {
+            redraw();
+        }
+    }, 300); // Wait for the CSS transition to complete
 }
 
 // Receive chat message
