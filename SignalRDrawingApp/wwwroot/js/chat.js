@@ -12,12 +12,46 @@ function getUserName() {
     return localStorage.getItem('userName') || '';
 }
 
+// Add a function to share the current position
+function shareCurrentPosition() {
+    if (!chatUserName) return;
+    
+    const viewState = window.getCurrentViewState();
+    const positionRef = `[position:${viewState.x},${viewState.y},${viewState.scale}]`;
+    
+    const input = document.getElementById('chat-input');
+    input.value += positionRef;
+    input.focus();
+}
+
+// Modify the appendMessage function to make position references clickable
 function appendMessage(user, message) {
     const msgDiv = document.createElement('div');
     msgDiv.className = 'chat-message';
-    msgDiv.innerHTML = `<span style='color:#6cf;font-weight:bold;'>${user}:</span> <span>${message}</span>`;
+    
+    // Parse position references in the format [position:x,y,scale]
+    const positionRegex = /\[position:(-?\d+\.?\d*),(-?\d+\.?\d*),(\d+\.?\d*)\]/g;
+    
+    // Replace position references with clickable links
+    const formattedMessage = message.replace(positionRegex, (match, x, y, scale) => {
+        return `<a href="#" class="position-link" data-x="${x}" data-y="${y}" data-scale="${scale}">📍(${x}, ${y})</a>`;
+    });
+    
+    msgDiv.innerHTML = `<span style='color:#6cf;font-weight:bold;'>${user}:</span> <span>${formattedMessage}</span>`;
     document.getElementById('chat-messages').appendChild(msgDiv);
     document.getElementById('chat-messages').scrollTop = document.getElementById('chat-messages').scrollHeight;
+    
+    // Add click handlers to position links
+    const positionLinks = msgDiv.querySelectorAll('.position-link');
+    positionLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const x = link.getAttribute('data-x');
+            const y = link.getAttribute('data-y');
+            const scale = link.getAttribute('data-scale');
+            window.animateToPosition(x, y, scale);
+        });
+    });
 }
 
 // Toggle chat sidebar visibility
@@ -133,10 +167,21 @@ document.addEventListener('DOMContentLoaded', function () {
     if (chatToggleBtn) {
         chatToggleBtn.addEventListener('click', toggleChat);
     }
-});
-
-// Auto-join chat after login in canvas.js
-window.addEventListener('userNameSet', function(e) {
-    chatUserName = e.detail;
-    chatConnection.invoke('JoinChat', chatUserName);
+    
+    // Add a share position button to the chat input
+    if (chatForm) {
+        const sharePositionBtn = document.createElement('button');
+        sharePositionBtn.className = 'btn btn-secondary position-btn';
+        sharePositionBtn.type = 'button';
+        sharePositionBtn.title = 'Share current position';
+        sharePositionBtn.innerHTML = '📍';
+        sharePositionBtn.addEventListener('click', shareCurrentPosition);
+        
+        // Insert before the send button
+        if (sendButton) {
+            chatForm.insertBefore(sharePositionBtn, sendButton);
+        } else {
+            chatForm.appendChild(sharePositionBtn);
+        }
+    }
 });

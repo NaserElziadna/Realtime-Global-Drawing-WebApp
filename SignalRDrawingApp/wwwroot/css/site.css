@@ -178,3 +178,25 @@ html {
   background-color: #6610f2;
   border-color: #6610f2;
 }
+
+/* Position sharing styles */
+.position-btn {
+  margin-right: 5px;
+  padding: 0.375rem 0.5rem;
+}
+
+.position-link {
+  display: inline-block;
+  background-color: rgba(0, 123, 255, 0.1);
+  border-radius: 4px;
+  padding: 2px 5px;
+  color: #6cf;
+  text-decoration: none;
+  transition: background-color 0.2s;
+}
+
+.position-link:hover {
+  background-color: rgba(0, 123, 255, 0.2);
+  text-decoration: none;
+  color: #7df;
+}

@@ -609,3 +609,96 @@ canvas.addEventListener('mousedown', function (e) {
 connection.on('updateUserCount', function (count) {
     document.getElementById('userCount').innerText = count + ' user(s)';
 });
+
+// Add this function to get the current view state
+function getCurrentViewState() {
+    // Calculate the center point of the current view
+    const centerX = -offsetX + (canvasWidth / 2) / scale;
+    const centerY = -offsetY + (canvasHeight / 2) / scale;
+    
+    return {
+        x: centerX.toFixed(2),
+        y: centerY.toFixed(2),
+        scale: scale.toFixed(2)
+    };
+}
+
+// Add this function to animate to a specific position
+function animateToPosition(targetX, targetY, targetScale) {
+    // Convert string parameters to numbers if needed
+    targetX = parseFloat(targetX);
+    targetY = parseFloat(targetY);
+    targetScale = parseFloat(targetScale);
+    
+    // Get current position (center of the view)
+    const startX = -offsetX + (canvasWidth / 2) / scale;
+    const startY = -offsetY + (canvasHeight / 2) / scale;
+    const startScale = scale;
+    
+    // Animation parameters
+    const duration = 1000; // ms
+    const startTime = Date.now();
+    
+    function animate() {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        
+        // Ease function (cubic ease in-out)
+        const easeProgress = progress < 0.5 
+            ? 4 * progress * progress * progress 
+            : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+        
+        // Interpolate values
+        const currentScale = startScale + (targetScale - startScale) * easeProgress;
+        const currentX = startX + (targetX - startX) * easeProgress;
+        const currentY = startY + (targetY - startY) * easeProgress;
+        
+        // Update the view
+        scale = currentScale;
+        offsetX = -(currentX - (canvasWidth / 2) / currentScale);
+        offsetY = -(currentY - (canvasHeight / 2) / currentScale);
+        
+        redraw();
+        
+        if (progress < 1) {
+            requestAnimationFrame(animate);
+        }
+    }
+    
+    animate();
+}
+
+// Make these functions available globally
+window.getCurrentViewState = getCurrentViewState;
+window.animateToPosition = animateToPosition;
+connection.on('cursormove', onOtherCursorMove);
+connection.on('backgroundcolour', onBackgroundColourChange);
+
+function onUndoStrokeEvent(data) {
+    removeFromHistory(data.data);
+}
+function onStrokeEvent(data) {
+    strokeHistory.push(data.data);
+    drawStroke(data.data);
+}
+function onStrokesEvent(data) {
+    strokeHistory = [...data.data, ...strokeHistory];
+    redraw();
+}
+
+// another user drawing
+function onDrawingEvent(data) {
+    canvasHistory.push({ x0: data.x0, y0: data.y0, x1: data.x1, y1: data.y1, colour: data.colour });
+    drawLine((data.x0 + offsetX) * scale, (data.y0 + offsetY) * scale, (data.x1 + offsetX) * scale, (data.y1 + offsetY) * scale, data.colour);
+}
+var connectedUsers = 0;
+function updateUserCount(count) {
+    const userCountElement = document.getElementById('userCount');
+    if (userCountElement) {
+        userCountElement.innerHTML = `${count} 👥`;
+    }
+}
+
+connection.on('updateUserCount', function (count) {
+    updateUserCount(count);
+});
