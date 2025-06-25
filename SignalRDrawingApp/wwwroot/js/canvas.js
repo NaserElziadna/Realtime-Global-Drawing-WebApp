@@ -206,10 +206,12 @@ function onMouseDown(evt) {
         rightMouseDown = false;
     }
 
-    cursorX = evt.pageX;
-    cursorY = evt.pageY;
-    cursorXprev = evt.pageX;
-    cursorYprev = evt.pageY;
+    // Get position relative to the canvas element, not the document
+    const rect = canvas.getBoundingClientRect();
+    cursorX = evt.clientX - rect.left;
+    cursorY = evt.clientY - rect.top;
+    cursorXprev = cursorX;
+    cursorYprev = cursorY;
 
     if (shiftDown || rightMouseDown) {
         canvas.style.cursor = 'grabbing';
@@ -476,10 +478,18 @@ function onHistoryEvent(drawHistory) {
     redraw();
 }
 function redraw() {
-    canvasWidth = document.body.clientWidth; //document.width is obsolete
-    canvasHeight = document.body.clientHeight; //document.height is obsolete
+    // Get the actual available width for the canvas, accounting for the chat sidebar
+    const appContainer = document.querySelector('.app-container');
+    const isChatHidden = appContainer.classList.contains('chat-hidden');
+    
+    // Use the actual client width of the canvas container instead of document.body
+    const canvasContainer = document.querySelector('.canvas-container');
+    canvasWidth = canvasContainer.clientWidth;
+    canvasHeight = document.body.clientHeight; // Height usually remains the same
+    
     canvas.width = canvasWidth;
     canvas.height = canvasHeight;
+    
     // Set Background Colour
     context.fillStyle = backgroundColour;
     context.fillRect(0, 0, canvas.width, canvas.height);
