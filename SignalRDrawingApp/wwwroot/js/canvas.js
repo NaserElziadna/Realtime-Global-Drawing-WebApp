@@ -475,9 +475,9 @@ function onBackgroundColourChange(colour) {
 }
 function setDocumentTitle(colour) {
     if (colour == lightBackgroundColour) {
-        document.title = 'Infiniboards';
+        document.title = 'Omni Canvas';
     } else {
-        document.title = 'Infiniboards';
+        document.title = 'Omni Canvas';
     }
 }
 function onOwnCursorMove(x, y) {
@@ -542,7 +542,7 @@ function throttle(callback, delay) {
 // https://stackoverflow.com/a/30832210/10159640
 function download() {
     let data = JSON.stringify(strokeHistory);
-    let filename = 'infiniboard.json';
+    let filename = 'omnicanvas.json';
     let type = 'json'
     var file = new Blob([data], { type: type });
     if (window.navigator.msSaveOrOpenBlob) // IE10+

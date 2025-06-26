@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+Disallow: /Admin/
+Disallow: /AdminLogin/
+Disallow: /api/
+
+# Allow access to CSS, JS, and image files
+Allow: /css/
+Allow: /js/
+Allow: /images/
+Allow: /lib/
+
+# Sitemap location
+Sitemap: /sitemap.xml 

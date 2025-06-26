@@ -6,13 +6,72 @@
     <meta name="theme-color" content="#343a40" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <title>@ViewData["Title"] - SignalRDrawingApp</title>
+    
+    <!-- SEO Meta Tags -->
+    <title>@ViewData["Title"] - Omni Canvas</title>
+    <meta name="description" content="@(ViewData["Description"] ?? "Omni Canvas - Real-time collaborative drawing platform. Create, share, and collaborate on infinite canvases with friends and colleagues in real-time.")" />
+    <meta name="keywords" content="collaborative drawing, real-time canvas, online whiteboard, digital art, team collaboration, drawing app, infinite canvas, creative platform" />
+    <meta name="author" content="Omni Canvas Team" />
+    <meta name="robots" content="index, follow" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="@ViewData["Title"] - Omni Canvas" />
+    <meta property="og:description" content="@(ViewData["Description"] ?? "Real-time collaborative drawing platform with infinite canvas possibilities.")" />
+    <meta property="og:image" content="~/images/omni-canvas-logo.svg" />
+    <meta property="og:url" content="@(Context.Request.Scheme)://@(Context.Request.Host)@(Context.Request.Path)" />
+    <meta property="og:site_name" content="Omni Canvas" />
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:title" content="@ViewData["Title"] - Omni Canvas" />
+    <meta property="twitter:description" content="@(ViewData["Description"] ?? "Real-time collaborative drawing platform with infinite canvas possibilities.")" />
+    <meta property="twitter:image" content="~/images/omni-canvas-logo.svg" />
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="~/images/omni-canvas-logo.svg" />
+    <link rel="apple-touch-icon" href="~/images/omni-canvas-logo.svg" />
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="@(Context.Request.Scheme)://@(Context.Request.Host)@(Context.Request.Path)" />
+    
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/SignalRDrawingApp.styles.css" asp-append-version="true" />
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+    
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@@context": "https://schema.org",
+        "@@type": "WebApplication",
+        "name": "Omni Canvas",
+        "description": "Real-time collaborative drawing platform with infinite canvas possibilities",
+        "applicationCategory": "DesignApplication",
+        "operatingSystem": "Web Browser",
+        "url": "@(Context.Request.Scheme)://@(Context.Request.Host)",
+        "screenshot": "~/images/omni-canvas-logo.svg",
+        "offers": {
+            "@@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        },
+        "creator": {
+            "@@type": "Organization",
+            "name": "Omni Canvas Team"
+        },
+        "featureList": [
+            "Real-time collaboration",
+            "Infinite canvas",
+            "Chat integration",
+            "Multi-user drawing",
+            "Export capabilities"
+        ]
+    }
+    </script>
+    
     <style>
         /* Ensure chat toggle is always visible */
         #chat-toggle {
