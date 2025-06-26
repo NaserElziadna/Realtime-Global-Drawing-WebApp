@@ -125,21 +125,56 @@
         }
     }
 
-    // Show the login modal on page load
-    $(document).ready(function () {
-        // Check for existing session/cookie
-        var existingUserName = getCookie('UserName') || '@ViewBag.UserName' || localStorage.getItem('userName');
+    // Function to check if user is already logged in
+    function checkExistingUser() {
+        // Check multiple sources for existing user
+        var cookieUserName = getCookie('UserName');
+        var sessionUserName = '@Html.Raw(Json.Serialize(ViewBag.UserName))';
+        var localUserName = localStorage.getItem('userName');
         
-        if (existingUserName && existingUserName !== '' && existingUserName !== 'null') {
-            // User already has a name, skip modal
+        // Clean up the session variable (remove Razor syntax artifacts)
+        if (sessionUserName && sessionUserName !== null && sessionUserName !== '""' && sessionUserName.length > 2) {
+            return sessionUserName.replace(/^"|"$/g, ''); // Remove surrounding quotes
+        }
+        
+        // Check cookie
+        if (cookieUserName && cookieUserName.length > 0 && cookieUserName !== 'null') {
+            return cookieUserName;
+        }
+        
+        // Check localStorage
+        if (localUserName && localUserName.length > 0 && localUserName !== 'null') {
+            return localUserName;
+        }
+        
+        return null;
+    }
+
+    // Show the login modal on page load only if user is not already logged in
+    $(document).ready(function () {
+        // Check if user is already logged in
+        var existingUserName = checkExistingUser();
+        
+        if (existingUserName) {
+            console.log('User already logged in as:', existingUserName);
+            // User already has a name, skip modal and join directly
             window.userName = existingUserName;
             showUserInfo(existingUserName);
-            connection.invoke('JoinRoom', existingUserName);
+            
+            // Wait for SignalR connection to be ready before joining
+            if (connection.state === signalR.HubConnectionState.Connected) {
+                connection.invoke('JoinRoom', existingUserName);
+            } else {
+                connection.start().then(function() {
+                    connection.invoke('JoinRoom', existingUserName);
+                });
+            }
             
             // Notify chat.js
             window.dispatchEvent(new CustomEvent('userNameSet', { detail: existingUserName }));
         } else {
-            // Show login modal
+            console.log('No existing user found, showing login modal');
+            // No existing user found, show login modal
             $('#loginModal').modal('show');
         }
         

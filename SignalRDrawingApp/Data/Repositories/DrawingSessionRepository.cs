@@ -24,11 +24,19 @@ namespace SignalRDrawingApp.Data.Repositories
         {
             var session = await AppDbContext.DrawingSessions
                 .Include(s => s.Strokes)
-                .FirstOrDefaultAsync(s => s.Id == 1);
+                .FirstOrDefaultAsync();
                 
             if (session == null)
             {
-                session = new DrawingSession { Id = 1, Name = "Default Session" };
+                session = new DrawingSession 
+                { 
+                    SessionName = "Default Session",
+                    UserName = "System",
+                    CreatedAt = DateTime.UtcNow,
+                    LastActivity = DateTime.UtcNow,
+                    IsActive = true,
+                    BackgroundColor = "#FFFFFF"
+                };
                 await AppDbContext.DrawingSessions.AddAsync(session);
                 await AppDbContext.SaveChangesAsync();
             }

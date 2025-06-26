@@ -1,6 +1,6 @@
 @model SignalRDrawingApp.Models.DrawingSession
 @{
-    ViewData["Title"] = $"Session Details - {Model.Name}";
+    ViewData["Title"] = $"Session Details - {Model.SessionName}";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
     var strokes = ViewBag.Strokes as IEnumerable<SignalRDrawingApp.Models.DrawingStroke>;
     var messages = ViewBag.Messages as IEnumerable<SignalRDrawingApp.Models.ChatMessage>;
@@ -21,15 +21,15 @@
                     </tr>
                     <tr>
                         <th>Name:</th>
-                        <td>@Model.Name</td>
+                        <td>@Model.SessionName</td>
                     </tr>
                     <tr>
                         <th>Created At:</th>
                         <td>@Model.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss")</td>
                     </tr>
                     <tr>
-                        <th>Last Modified:</th>
-                        <td>@(Model.LastModifiedAt?.ToString("yyyy-MM-dd HH:mm:ss") ?? "Never")</td>
+                        <th>Last Activity:</th>
+                        <td>@Model.LastActivity.ToString("yyyy-MM-dd HH:mm:ss")</td>
                     </tr>
                     <tr>
                         <th>Background Color:</th>
@@ -90,7 +90,7 @@
                     <button class="btn btn-warning" onclick="clearChatMessages(@Model.Id)">
                         <i class="fas fa-trash"></i> Clear Chat Messages
                     </button>
-                    <button class="btn btn-danger" onclick="deleteSession(@Model.Id, '@Model.Name')">
+                    <button class="btn btn-danger" onclick="deleteSession(@Model.Id, '@Model.SessionName')">
                         <i class="fas fa-trash-alt"></i> Delete Session
                     </button>
                 </div>
@@ -128,7 +128,7 @@
                                 <tr>
                                     <td>@stroke.Id</td>
                                     <td style="max-width: 400px; word-wrap: break-word; font-family: monospace; font-size: 11px;">
-                                        @(stroke.StrokeData.Length > 150 ? stroke.StrokeData.Substring(0, 150) + "..." : stroke.StrokeData)
+                                        @(stroke.Points.Length > 150 ? stroke.Points.Substring(0, 150) + "..." : stroke.Points)
                                     </td>
                                     <td>@stroke.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss")</td>
                                 </tr>
@@ -174,17 +174,17 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var message in messages.OrderByDescending(m => m.CreatedAt))
+                            @foreach (var message in messages.OrderByDescending(m => m.Timestamp))
                             {
                                 <tr>
                                     <td>@message.Id</td>
                                     <td>
-                                        <span class="badge badge-primary">@message.Username</span>
+                                        <span class="badge badge-primary">@message.UserName</span>
                                     </td>
                                     <td style="max-width: 400px; word-wrap: break-word;">
                                         @message.Message
                                     </td>
-                                    <td>@message.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                                    <td>@message.Timestamp.ToString("yyyy-MM-dd HH:mm:ss")</td>
                                 </tr>
                             }
                         </tbody>

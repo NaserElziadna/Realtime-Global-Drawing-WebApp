@@ -8,7 +8,9 @@
         <form id="chat-form" onsubmit="return false;" class="d-flex flex-wrap">
             <input id="chat-input" type="text" class="form-control flex-grow-1" placeholder="Type a message..." autocomplete="off">
             <div class="d-flex mt-1 mt-sm-0">
-                <!-- The position button will be inserted here by JavaScript -->
+                <button class="btn btn-secondary position-btn ml-sm-1" type="button" id="share-position" title="Share current position">
+                    📍
+                </button>
                 <button class="btn btn-primary ml-sm-1" type="button" id="send-message">
                     <span class="d-none d-sm-inline">Send</span>
                     <span class="d-inline d-sm-none">📤</span>

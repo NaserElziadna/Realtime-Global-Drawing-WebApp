@@ -13,7 +13,6 @@ namespace SignalRDrawingApp.Hubs
     {
         private readonly IUnitOfWork _unitOfWork;
         private static ConcurrentDictionary<string, string> ConnectedUsers = new ConcurrentDictionary<string, string>();
-        private static int DefaultSessionId = 1;
 
         public DrawingHub(IUnitOfWork unitOfWork)
         {
@@ -28,8 +27,11 @@ namespace SignalRDrawingApp.Hubs
 
         public async Task SendStroke(object stroke)
         {
+            // Get the default session
+            var session = await _unitOfWork.DrawingSessions.GetDefaultSessionAsync();
+            
             // Save stroke to database
-            await _unitOfWork.DrawingStrokes.AddStrokeFromObjectAsync(stroke, DefaultSessionId);
+            await _unitOfWork.DrawingStrokes.AddStrokeFromObjectAsync(stroke, session.Id);
             await _unitOfWork.CompleteAsync();
             
             // Send to other clients
@@ -40,10 +42,13 @@ namespace SignalRDrawingApp.Hubs
         {
             if (strokes is IEnumerable<object> strokesList)
             {
+                // Get the default session
+                var session = await _unitOfWork.DrawingSessions.GetDefaultSessionAsync();
+                
                 // Save strokes to database
                 foreach (var stroke in strokesList)
                 {
-                    await _unitOfWork.DrawingStrokes.AddStrokeFromObjectAsync(stroke, DefaultSessionId);
+                    await _unitOfWork.DrawingStrokes.AddStrokeFromObjectAsync(stroke, session.Id);
                 }
                 await _unitOfWork.CompleteAsync();
             }
@@ -68,8 +73,8 @@ namespace SignalRDrawingApp.Hubs
 
         public async Task SendBackgroundColour(object data)
         {
-            // Update the background color in the database
-            var session = await _unitOfWork.DrawingSessions.GetByIdAsync(DefaultSessionId);
+            // Get the default session and update the background color
+            var session = await _unitOfWork.DrawingSessions.GetDefaultSessionAsync();
             if (session != null && data != null)
             {
                 // Extract the color from the data object
@@ -81,7 +86,7 @@ namespace SignalRDrawingApp.Hubs
                     if (!string.IsNullOrEmpty(color))
                     {
                         session.BackgroundColor = color;
-                        session.LastModifiedAt = DateTime.UtcNow;
+                        session.LastActivity = DateTime.UtcNow;
                         _unitOfWork.DrawingSessions.Update(session);
                         await _unitOfWork.CompleteAsync();
                     }
@@ -108,7 +113,7 @@ namespace SignalRDrawingApp.Hubs
 
         public override async Task OnDisconnectedAsync(Exception? exception)
         {
-            if (ConnectedUsers.TryRemove(Context.ConnectionId, out string userName))
+            if (ConnectedUsers.TryRemove(Context.ConnectionId, out string? userName) && userName != null)
             {
                 await Clients.Others.SendAsync("userLeft", userName);
                 await Clients.All.SendAsync("updateUserCount", ConnectedUsers.Count);

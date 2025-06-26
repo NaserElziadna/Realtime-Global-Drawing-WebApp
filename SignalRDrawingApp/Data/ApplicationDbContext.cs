@@ -1,9 +1,10 @@
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using SignalRDrawingApp.Models;
 
 namespace SignalRDrawingApp.Data
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
@@ -18,29 +19,70 @@ namespace SignalRDrawingApp.Data
         {
             base.OnModelCreating(modelBuilder);
             
-            // Configure relationships for DrawingStroke
-            modelBuilder.Entity<DrawingStroke>()
-                .HasOne(s => s.DrawingSession)
-                .WithMany(s => s.Strokes)
-                .HasForeignKey(s => s.DrawingSessionId)
-                .OnDelete(DeleteBehavior.Cascade);
+            // Configure DrawingSession
+            modelBuilder.Entity<DrawingSession>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.SessionName).IsRequired().HasMaxLength(100);
+                entity.Property(e => e.UserName).HasMaxLength(100);
+                entity.Property(e => e.BackgroundColor).HasDefaultValue("#FFFFFF");
                 
-            // Configure relationships for ChatMessage
-            modelBuilder.Entity<ChatMessage>()
-                .HasOne(c => c.DrawingSession)
-                .WithMany(s => s.ChatMessages)
-                .HasForeignKey(c => c.DrawingSessionId)
-                .OnDelete(DeleteBehavior.Cascade);
+                // Configure relationship with ApplicationUser
+                entity.HasOne(e => e.User)
+                      .WithMany(u => u.DrawingSessions)
+                      .HasForeignKey(e => e.UserId)
+                      .OnDelete(DeleteBehavior.SetNull);
+            });
+
+            // Configure DrawingStroke
+            modelBuilder.Entity<DrawingStroke>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Points).IsRequired();
+                entity.Property(e => e.Color).HasMaxLength(7).HasDefaultValue("#000000");
+                entity.Property(e => e.Thickness).HasDefaultValue(2);
+                entity.Property(e => e.UserName).HasMaxLength(100);
                 
-            // Create a default drawing session
-            modelBuilder.Entity<DrawingSession>().HasData(
-                new DrawingSession
-                {
-                    Id = 1,
-                    Name = "Default Session",
-                    CreatedAt = System.DateTime.UtcNow
-                }
-            );
+                // Configure relationship with ApplicationUser
+                entity.HasOne(e => e.User)
+                      .WithMany()
+                      .HasForeignKey(e => e.UserId)
+                      .OnDelete(DeleteBehavior.SetNull);
+                
+                // Configure relationship with DrawingSession
+                entity.HasOne(e => e.Session)
+                      .WithMany(s => s.Strokes)
+                      .HasForeignKey(e => e.SessionId)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // Configure ChatMessage
+            modelBuilder.Entity<ChatMessage>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.UserName).IsRequired().HasMaxLength(100);
+                entity.Property(e => e.Message).IsRequired().HasMaxLength(1000);
+                
+                // Configure relationship with ApplicationUser
+                entity.HasOne(e => e.User)
+                      .WithMany(u => u.ChatMessages)
+                      .HasForeignKey(e => e.UserId)
+                      .OnDelete(DeleteBehavior.SetNull);
+                
+                // Configure relationship with DrawingSession
+                entity.HasOne(e => e.Session)
+                      .WithMany(s => s.ChatMessages)
+                      .HasForeignKey(e => e.SessionId)
+                      .OnDelete(DeleteBehavior.SetNull);
+            });
+
+            // Configure ApplicationUser
+            modelBuilder.Entity<ApplicationUser>(entity =>
+            {
+                entity.Property(e => e.DisplayName).HasMaxLength(100);
+                entity.Property(e => e.PreferredColor).HasMaxLength(50).HasDefaultValue("#007bff");
+                entity.Property(e => e.IsActive).HasDefaultValue(true);
+            });
         }
     }
 } 

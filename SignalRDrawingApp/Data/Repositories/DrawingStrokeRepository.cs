@@ -18,7 +18,7 @@ namespace SignalRDrawingApp.Data.Repositories
         public async Task<IEnumerable<DrawingStroke>> GetBySessionIdAsync(int sessionId)
         {
             return await AppDbContext.DrawingStrokes
-                .Where(s => s.DrawingSessionId == sessionId)
+                .Where(s => s.SessionId == sessionId)
                 .ToListAsync();
         }
         

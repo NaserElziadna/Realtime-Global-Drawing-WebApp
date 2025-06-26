@@ -36,22 +36,22 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var message in Model.OrderByDescending(m => m.CreatedAt))
+                            @foreach (var message in Model.OrderByDescending(m => m.Timestamp))
                             {
                                 <tr>
                                     <td>@message.Id</td>
                                     <td>
-                                        <span class="badge badge-primary">@message.Username</span>
+                                        <span class="badge badge-primary">@message.UserName</span>
                                     </td>
                                     <td style="max-width: 300px; word-wrap: break-word;">
                                         @message.Message
                                     </td>
                                     <td>
-                                        <a href="/Admin/SessionDetails/@message.DrawingSessionId" class="badge badge-info">
-                                            Session @message.DrawingSessionId
+                                        <a href="/Admin/SessionDetails/@message.SessionId" class="badge badge-info">
+                                            Session @message.SessionId
                                         </a>
                                     </td>
-                                    <td>@message.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                                    <td>@message.Timestamp.ToString("yyyy-MM-dd HH:mm:ss")</td>
                                     <td>
                                         <button class="btn btn-sm btn-danger" onclick="deleteMessage(@message.Id, '@Html.Raw(Html.Encode(message.Message))')">
                                             <i class="fas fa-trash"></i>
@@ -96,7 +96,7 @@
             <span class="info-box-icon bg-success"><i class="fas fa-users"></i></span>
             <div class="info-box-content">
                 <span class="info-box-text">Unique Users</span>
-                <span class="info-box-number">@Model.Select(m => m.Username).Distinct().Count()</span>
+                <span class="info-box-number">@Model.Select(m => m.UserName).Distinct().Count()</span>
             </div>
         </div>
     </div>
@@ -108,7 +108,7 @@
                 <span class="info-box-number">
                     @if (Model.Any())
                     {
-                        @Model.OrderByDescending(m => m.CreatedAt).First().CreatedAt.ToString("MMM dd")
+                        @Model.OrderByDescending(m => m.Timestamp).First().Timestamp.ToString("MMM dd")
                     }
                     else
                     {
@@ -123,7 +123,7 @@
             <span class="info-box-icon bg-danger"><i class="fas fa-database"></i></span>
             <div class="info-box-content">
                 <span class="info-box-text">Sessions</span>
-                <span class="info-box-number">@Model.Select(m => m.DrawingSessionId).Distinct().Count()</span>
+                <span class="info-box-number">@Model.Select(m => m.SessionId).Distinct().Count()</span>
             </div>
         </div>
     </div>
@@ -140,7 +140,7 @@
                 </div>
                 <div class="card-body">
                     <ul class="list-group list-group-flush">
-                        @foreach (var user in Model.GroupBy(m => m.Username)
+                        @foreach (var user in Model.GroupBy(m => m.UserName)
                                                    .OrderByDescending(g => g.Count())
                                                    .Take(5)
                                                    .Select(g => new { Username = g.Key, Count = g.Count() }))
@@ -161,12 +161,12 @@
                 </div>
                 <div class="card-body">
                     <ul class="list-group list-group-flush">
-                        @foreach (var message in Model.OrderByDescending(m => m.CreatedAt).Take(5))
+                        @foreach (var message in Model.OrderByDescending(m => m.Timestamp).Take(5))
                         {
                             <li class="list-group-item">
-                                <strong>@message.Username</strong>: @(message.Message.Length > 50 ? message.Message.Substring(0, 50) + "..." : message.Message)
+                                <strong>@message.UserName</strong>: @(message.Message.Length > 50 ? message.Message.Substring(0, 50) + "..." : message.Message)
                                 <br>
-                                <small class="text-muted">@message.CreatedAt.ToString("MMM dd, HH:mm")</small>
+                                <small class="text-muted">@message.Timestamp.ToString("MMM dd, HH:mm")</small>
                             </li>
                         }
                     </ul>

@@ -18,10 +18,10 @@ namespace SignalRDrawingApp.Data.Repositories
         public async Task<IEnumerable<ChatMessage>> GetBySessionIdAsync(int sessionId, int maxMessages = 100)
         {
             return await AppDbContext.ChatMessages
-                .Where(c => c.DrawingSessionId == sessionId)
-                .OrderByDescending(c => c.CreatedAt)
+                .Where(c => c.SessionId == sessionId)
+                .OrderByDescending(c => c.Timestamp)
                 .Take(maxMessages)
-                .OrderBy(c => c.CreatedAt)
+                .OrderBy(c => c.Timestamp)
                 .ToListAsync();
         }
         
@@ -29,9 +29,9 @@ namespace SignalRDrawingApp.Data.Repositories
         {
             var chatMessage = new ChatMessage
             {
-                Username = username,
+                UserName = username,
                 Message = message,
-                DrawingSessionId = sessionId
+                SessionId = sessionId
             };
             
             await AddAsync(chatMessage);

@@ -40,9 +40,9 @@
                             {
                                 <tr>
                                     <td>@session.Id</td>
-                                    <td>@session.Name</td>
+                                    <td>@session.SessionName</td>
                                     <td>@session.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss")</td>
-                                    <td>@(session.LastModifiedAt?.ToString("yyyy-MM-dd HH:mm:ss") ?? "Never")</td>
+                                    <td>@(session.LastActivity.ToString("yyyy-MM-dd HH:mm:ss"))</td>
                                     <td>
                                         <span class="badge" style="background-color: @session.BackgroundColor; color: @(session.BackgroundColor == "#FFFFFF" ? "#000" : "#fff");">
                                             @session.BackgroundColor
@@ -53,7 +53,7 @@
                                             <a href="/Admin/SessionDetails/@session.Id" class="btn btn-sm btn-info">
                                                 <i class="fas fa-eye"></i> View
                                             </a>
-                                            <button class="btn btn-sm btn-danger" onclick="deleteSession(@session.Id, '@session.Name')">
+                                            <button class="btn btn-sm btn-danger" onclick="deleteSession(@session.Id, '@session.SessionName')">
                                                 <i class="fas fa-trash"></i> Delete
                                             </button>
                                         </div>
@@ -115,7 +115,7 @@
             <span class="info-box-icon bg-warning"><i class="fas fa-edit"></i></span>
             <div class="info-box-content">
                 <span class="info-box-text">Modified Sessions</span>
-                <span class="info-box-number">@Model.Count(s => s.LastModifiedAt != null)</span>
+                <span class="info-box-number">@Model.Count(s => s.LastActivity > s.CreatedAt)</span>
             </div>
         </div>
     </div>

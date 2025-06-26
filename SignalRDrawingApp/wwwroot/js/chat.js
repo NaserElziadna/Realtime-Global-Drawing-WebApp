@@ -223,21 +223,10 @@ document.addEventListener('DOMContentLoaded', function () {
         mobileChatToggleBtn.addEventListener('click', toggleChat);
     }
     
-    // Add a share position button to the chat input
-    if (chatForm) {
-        const sharePositionBtn = document.createElement('button');
-        sharePositionBtn.className = 'btn btn-secondary position-btn';
-        sharePositionBtn.type = 'button';
-        sharePositionBtn.title = 'Share current position';
-        sharePositionBtn.innerHTML = '📍';
+    // Set up share position button
+    const sharePositionBtn = document.getElementById('share-position');
+    if (sharePositionBtn) {
         sharePositionBtn.addEventListener('click', shareCurrentPosition);
-        
-        // Insert before the send button
-        if (sendButton) {
-            chatForm.insertBefore(sharePositionBtn, sendButton);
-        } else {
-            chatForm.appendChild(sharePositionBtn);
-        }
     }
     
     // Fix for mobile devices - ensure chat toggle is visible
