@@ -34,6 +34,7 @@ body {
   transition: transform 0.3s ease-in-out;
   border-left: 1px solid #333;
   box-shadow: -2px 0 10px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
 }
 
 .chat-header {
@@ -199,4 +200,120 @@ html {
   background-color: rgba(0, 123, 255, 0.2);
   text-decoration: none;
   color: #7df;
+}
+
+/* Responsive styles for mobile devices */
+@media (max-width: 768px) {
+  /* Change app container to column layout on mobile */
+  .app-container {
+    flex-direction: column;
+  }
+  
+  /* Chat sidebar takes full width but limited height on mobile */
+  .chat-sidebar {
+    width: 100%;
+    height: 40vh;
+    border-left: none;
+    border-top: 1px solid #333;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    transition: transform 0.3s ease-in-out;
+  }
+  
+  /* Adjust chat toggle position for mobile */
+  .chat-toggle {
+    top: auto;
+    bottom: 40vh; /* Match the chat sidebar height */
+    right: 10px;
+    border-radius: 4px 4px 0 0;
+    transform: rotate(90deg);
+    transform-origin: bottom right;
+  }
+  
+  /* Update hidden state for mobile */
+  .app-container.chat-hidden .chat-sidebar {
+    transform: translateY(100%); /* Move it off-screen to the bottom */
+  }
+  
+  .app-container.chat-hidden .chat-toggle {
+    bottom: 0;
+  }
+  
+  /* Make color buttons more touch-friendly */
+  .btn-toolbar .btn {
+    padding: 10px 15px;
+    margin: 2px;
+  }
+  
+  /* Adjust overlay positions to be more visible on mobile */
+  .overlay-top-left,
+  .overlay-top-right,
+  .overlay-bottom-left,
+  .overlay-bottom-right {
+    padding: 5px;
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 5px;
+  }
+  
+  /* Make modals more mobile-friendly */
+  .modal-dialog {
+    margin: 10px;
+    max-width: calc(100% - 20px);
+  }
+  
+  /* Improve form controls for touch */
+  input, button, .btn {
+    min-height: 44px; /* Apple's recommended minimum touch target size */
+  }
+}
+
+/* Adjust for very small screens */
+@media (max-width: 480px) {
+  /* Stack color buttons vertically on very small screens */
+  .btn-toolbar.overlay-top-left {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .btn-toolbar.overlay-top-left .btn-group {
+    margin-right: 0;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+    max-width: 160px;
+  }
+  
+  /* Make buttons more visible */
+  .overlay-bottom-right .btn,
+  .overlay-bottom-left .btn {
+    margin-bottom: 5px;
+    display: block;
+    width: auto;
+  }
+  
+  /* Adjust chat height for very small screens */
+  .chat-sidebar {
+    height: 50vh;
+  }
+  
+  .chat-toggle {
+    bottom: 50vh;
+  }
+}
+
+/* Ensure proper display in landscape mode */
+@media (max-height: 480px) and (orientation: landscape) {
+  .chat-sidebar {
+    height: 70vh;
+  }
+  
+  .chat-toggle {
+    bottom: 70vh;
+  }
+  
+  /* Adjust modal positioning for landscape */
+  .modal-dialog-centered {
+    min-height: calc(100% - 20px);
+  }
 }

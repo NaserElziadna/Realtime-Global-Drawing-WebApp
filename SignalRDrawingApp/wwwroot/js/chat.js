@@ -58,15 +58,16 @@ function appendMessage(user, message) {
 function toggleChat() {
     const appContainer = document.querySelector('.app-container');
     const chatToggleIcon = document.getElementById('chat-toggle-icon');
+    const isMobile = window.innerWidth <= 768;
     
     if (chatVisible) {
         // Hide chat
         appContainer.classList.add('chat-hidden');
-        chatToggleIcon.textContent = '❯';
+        chatToggleIcon.textContent = isMobile ? '▲' : '❯';
     } else {
         // Show chat
         appContainer.classList.remove('chat-hidden');
-        chatToggleIcon.textContent = '❮';
+        chatToggleIcon.textContent = isMobile ? '▼' : '❮';
     }
     
     chatVisible = !chatVisible;
@@ -82,6 +83,18 @@ function toggleChat() {
         }
     }, 300); // Wait for the CSS transition to complete
 }
+
+// Update toggle icon on resize
+window.addEventListener('resize', function() {
+    if (!chatVisible) return; // Only update if chat is visible
+    
+    const chatToggleIcon = document.getElementById('chat-toggle-icon');
+    const isMobile = window.innerWidth <= 768;
+    
+    if (chatToggleIcon) {
+        chatToggleIcon.textContent = isMobile ? '▼' : '❮';
+    }
+});
 
 // Receive chat message
 chatConnection.on('ReceiveMessage', (user, message) => {

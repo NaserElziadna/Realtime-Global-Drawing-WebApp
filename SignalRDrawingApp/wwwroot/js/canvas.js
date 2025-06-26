@@ -99,21 +99,39 @@ canvas.addEventListener('mouseup', onMouseUp, false);
 canvas.addEventListener('mouseout', onMouseUp, false);
 canvas.addEventListener('mousemove', throttle(onMouseMove, 25), false);
 
-// Touch Event Handlers 
+// Touch Event Handlers with improved handling
 canvas.addEventListener('touchstart', onTouchStart, { passive: false });
 canvas.addEventListener('touchend', onTouchEnd, { passive: false });
 canvas.addEventListener('touchcancel', onTouchEnd, { passive: false });
-canvas.addEventListener('touchmove', throttle(onTouchMove, 25), { passive: false });
+canvas.addEventListener('touchmove', throttle(onTouchMove, 10), { passive: false }); // Reduced throttle for smoother drawing
 
+// Prevent scrolling when touching the canvas
+canvas.addEventListener('touchstart', function(e) {
+    if (e.target == canvas) {
+        e.preventDefault();
+    }
+}, { passive: false });
 
 function onTouchStart(evt) {
+    evt.preventDefault(); // Prevent default touch actions
+    
     if (evt.touches.length == 1) {
+        // Single touch - drawing mode
         panning = false;
         drawing = true;
-
+        
+        // Get position relative to the canvas element
+        const rect = canvas.getBoundingClientRect();
+        const touch = evt.touches[0];
+        const touchX = touch.clientX - rect.left;
+        const touchY = touch.clientY - rect.top;
+        
+        // Start the stroke
+        addToStroke((touchX / scale) - offsetX, (touchY / scale) - offsetY, penColour);
+        
         lastTouches[0] = evt.touches[0];
-
     } else if (evt.touches.length >= 2) {
+        // Multi-touch - panning/zooming mode
         panning = true;
         drawing = false;
         removeAllDots();
@@ -122,6 +140,7 @@ function onTouchStart(evt) {
         lastTouches[1] = evt.touches[1];
     }
 }
+
 function onTouchEnd(e) {
     if (drawing) {
         emitStroke();
@@ -478,24 +497,33 @@ function onHistoryEvent(drawHistory) {
     redraw();
 }
 function redraw() {
-    // Get the actual available width for the canvas, accounting for the chat sidebar
-    const appContainer = document.querySelector('.app-container');
-    const isChatHidden = appContainer.classList.contains('chat-hidden');
+    // Check if we're in a mobile context
+    const isMobile = window.innerWidth <= 768;
     
-    // Use the actual client width of the canvas container instead of document.body
-    const canvasContainer = document.querySelector('.canvas-container');
-    canvasWidth = canvasContainer.clientWidth;
-    canvasHeight = document.body.clientHeight; // Height usually remains the same
+    // Get the current dimensions of the canvas container
+    canvasWidth = canvas.width = canvas.offsetWidth;
+    canvasHeight = canvas.height = canvas.offsetHeight;
     
-    canvas.width = canvasWidth;
-    canvas.height = canvasHeight;
-    
-    // Set Background Colour
+    // Fill background
     context.fillStyle = backgroundColour;
     context.fillRect(0, 0, canvas.width, canvas.height);
-    strokeHistory.forEach(data => {
-        drawStroke({ vectors: data.vectors, colour: data.colour })
+    
+    // Set line properties - thicker lines on mobile for better touch experience
+    context.lineJoin = "round";
+    context.lineCap = "round";
+    context.lineWidth = isMobile ? 5 : 3;
+
+    // Redraw all strokes
+    strokeHistory.forEach(stroke => {
+        drawStroke(stroke);
     });
+    
+    // Adjust cursor style based on device
+    if (isMobile) {
+        canvas.style.cursor = 'default'; // Default cursor on mobile as it's touch-based
+    } else {
+        canvas.style.cursor = shiftDown ? 'grab' : 'crosshair';
+    }
 }
 
 // limit the number of events per second

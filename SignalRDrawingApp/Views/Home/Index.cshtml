@@ -4,7 +4,7 @@
 
 <!-- Login Modal -->
 <div class="modal fade" id="loginModal" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Welcome to Drawing Room</h5>
@@ -12,17 +12,17 @@
             <div class="modal-body">
                 <div class="form-group">
                     <label for="userName">Please enter your name:</label>
-                    <input type="text" class="form-control" id="userName" required>
+                    <input type="text" class="form-control" id="userName" required autocomplete="name">
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" id="joinRoom">Join Room</button>
+                <button type="button" class="btn btn-primary btn-block" id="joinRoom">Join Room</button>
             </div>
         </div>
     </div>
 </div>
 
-<div class="app-container">
+<div class="app-container chat-hidden">
     <!-- Canvas Area -->
     <partial name="_CanvasPartial" />
     
@@ -63,8 +63,8 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <div class="modal-body text-center">
-                <p>
+            <div class="modal-body">
+                <div class="table-responsive">
                     <table class="table table-borderless">
                         <tbody>
                             <tr>
@@ -81,10 +81,10 @@
                             </tr>
                         </tbody>
                     </table>
-                </p>
+                </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary btn-block" data-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
@@ -94,6 +94,14 @@
     // Show the login modal on page load
     $(document).ready(function () {
         $('#loginModal').modal('show');
+        
+        // Handle Enter key in username field
+        $('#userName').keypress(function(e) {
+            if (e.which === 13) {
+                $('#joinRoom').click();
+                return false;
+            }
+        });
     });
 
     // Join room button click event
@@ -107,6 +115,12 @@
             
             // Notify chat.js
             window.dispatchEvent(new CustomEvent('userNameSet', { detail: userName }));
+            
+            // On mobile, start with chat hidden
+            if (window.innerWidth <= 768) {
+                $('.app-container').addClass('chat-hidden');
+                $('#chat-toggle-icon').text('▲');
+            }
         } else {
             alert('Please enter your name');
         }
