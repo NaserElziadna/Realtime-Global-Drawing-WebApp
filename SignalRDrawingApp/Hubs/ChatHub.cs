@@ -43,7 +43,7 @@ namespace SignalRDrawingApp.Hubs
             await Clients.All.SendAsync("ReceiveMessage", user, message);
         }
 
-        public override async Task OnDisconnectedAsync(Exception exception)
+        public override async Task OnDisconnectedAsync(Exception? exception)
         {
             if (ConnectedUsers.TryRemove(Context.ConnectionId, out string userName))
             {

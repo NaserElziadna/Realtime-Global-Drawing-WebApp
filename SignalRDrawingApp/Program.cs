@@ -1,3 +1,6 @@
+using Microsoft.EntityFrameworkCore;
+using SignalRDrawingApp.Data;
+using SignalRDrawingApp.Data.UnitOfWork;
 using SignalRDrawingApp.Hubs;
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +14,17 @@ builder.Services.AddCors(options =>
                .AllowAnyHeader();
     }));
 builder.Services.AddSignalR();
+
+// Add database context
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        b => b.MigrationsAssembly("SignalRDrawingApp")
+    )
+);
+
+// Register the UnitOfWork
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 var app = builder.Build();
 
