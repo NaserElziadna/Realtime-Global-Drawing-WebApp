@@ -19,5 +19,8 @@ namespace SignalRDrawingApp.Models
         
         // Navigation property for strokes
         public ICollection<DrawingStroke> Strokes { get; set; } = new List<DrawingStroke>();
+        
+        // Navigation property for chat messages
+        public ICollection<ChatMessage> ChatMessages { get; set; } = new List<ChatMessage>();
     }
 } 

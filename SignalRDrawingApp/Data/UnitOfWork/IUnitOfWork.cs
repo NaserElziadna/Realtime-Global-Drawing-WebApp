@@ -8,6 +8,7 @@ namespace SignalRDrawingApp.Data.UnitOfWork
     {
         IDrawingSessionRepository DrawingSessions { get; }
         IDrawingStrokeRepository DrawingStrokes { get; }
+        IChatMessageRepository ChatMessages { get; }
         
         Task<int> CompleteAsync();
     }

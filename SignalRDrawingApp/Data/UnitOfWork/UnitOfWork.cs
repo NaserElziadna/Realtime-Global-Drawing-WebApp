@@ -10,12 +10,14 @@ namespace SignalRDrawingApp.Data.UnitOfWork
         
         public IDrawingSessionRepository DrawingSessions { get; private set; }
         public IDrawingStrokeRepository DrawingStrokes { get; private set; }
+        public IChatMessageRepository ChatMessages { get; private set; }
         
         public UnitOfWork(ApplicationDbContext context)
         {
             _context = context;
             DrawingSessions = new DrawingSessionRepository(context);
             DrawingStrokes = new DrawingStrokeRepository(context);
+            ChatMessages = new ChatMessageRepository(context);
         }
         
         public async Task<int> CompleteAsync()

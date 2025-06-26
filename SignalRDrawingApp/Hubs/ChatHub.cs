@@ -1,45 +1,54 @@
 using Microsoft.AspNetCore.SignalR;
-using System.Threading.Tasks;
-using System.Collections.Concurrent;
+using SignalRDrawingApp.Data.UnitOfWork;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SignalRDrawingApp.Hubs
 {
     public class ChatHub : Hub
     {
+        private readonly IUnitOfWork _unitOfWork;
         private static ConcurrentDictionary<string, string> ConnectedUsers = new ConcurrentDictionary<string, string>();
-        private static List<(string User, string Message)> MessageHistory = new List<(string, string)>();
+        private static int DefaultSessionId = 1;
         private const int MAX_HISTORY = 100; // Limit history to prevent memory issues
+        
+        public ChatHub(IUnitOfWork unitOfWork)
+        {
+            _unitOfWork = unitOfWork;
+        }
 
         public async Task JoinChat(string userName)
         {
             ConnectedUsers[Context.ConnectionId] = userName;
             
-            // Send message history to the joining user
-            foreach (var (user, message) in MessageHistory)
+            // Send message history from database to the joining user
+            var messages = await _unitOfWork.ChatMessages.GetBySessionIdAsync(DefaultSessionId, MAX_HISTORY);
+            foreach (var message in messages)
             {
-                await Clients.Caller.SendAsync("ReceiveMessage", user, message);
+                await Clients.Caller.SendAsync("ReceiveMessage", message.Username, message.Message);
             }
             
             await UpdateUserList();
             await Clients.All.SendAsync("updateUserCount", ConnectedUsers.Count);
             
-            // Announce new user joined
-            await Clients.Others.SendAsync("ReceiveMessage", "System", $"{userName} joined the chat");
+            // Announce new user joined and save to database
+            string systemMessage = $"{userName} joined the chat";
+            await _unitOfWork.ChatMessages.AddMessageAsync("System", systemMessage, DefaultSessionId);
+            await _unitOfWork.CompleteAsync();
+            
+            await Clients.Others.SendAsync("ReceiveMessage", "System", systemMessage);
         }
 
         public async Task SendMessage(string user, string message)
         {
-            // Add to history
-            MessageHistory.Add((user, message));
+            // Add to database
+            await _unitOfWork.ChatMessages.AddMessageAsync(user, message, DefaultSessionId);
+            await _unitOfWork.CompleteAsync();
             
-            // Trim history if it gets too large
-            if (MessageHistory.Count > MAX_HISTORY)
-            {
-                MessageHistory.RemoveAt(0);
-            }
-            
+            // Send to all clients
             await Clients.All.SendAsync("ReceiveMessage", user, message);
         }
 
@@ -47,7 +56,12 @@ namespace SignalRDrawingApp.Hubs
         {
             if (ConnectedUsers.TryRemove(Context.ConnectionId, out string userName))
             {
-                await Clients.Others.SendAsync("ReceiveMessage", "System", $"{userName} left the chat");
+                // Save disconnect message to database
+                string systemMessage = $"{userName} left the chat";
+                await _unitOfWork.ChatMessages.AddMessageAsync("System", systemMessage, DefaultSessionId);
+                await _unitOfWork.CompleteAsync();
+                
+                await Clients.Others.SendAsync("ReceiveMessage", "System", systemMessage);
             }
             
             await UpdateUserList();
