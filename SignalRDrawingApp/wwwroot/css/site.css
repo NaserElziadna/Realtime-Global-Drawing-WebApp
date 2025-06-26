@@ -16,6 +16,8 @@ body {
   flex: 1;
   position: relative;
   overflow: hidden;
+  height: 100vh; /* Ensure full height */
+  width: 100%; /* Ensure full width */
 }
 
 #whiteboard {
@@ -35,6 +37,17 @@ body {
   border-left: 1px solid #333;
   box-shadow: -2px 0 10px rgba(0, 0, 0, 0.3);
   z-index: 1000;
+}
+
+/* Chat sidebar - reset styling to ensure visibility */
+.chat-sidebar {
+  background: #222;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  box-shadow: -2px 0 10px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  transition: transform 0.3s ease-in-out;
 }
 
 .chat-header {
@@ -83,27 +96,108 @@ body {
 
 /* Update the chat toggle button positioning */
 .chat-toggle {
-  position: absolute;
-  top: 10px;
-  right: 320px; /* Position it next to the sidebar */
-  z-index: 1051;
-  border-radius: 4px 0 0 4px;
-  padding: 8px 12px;
-  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
+  position: fixed;
+  top: auto;
+  bottom: 40vh;
+  right: 0;
+  border-radius: 4px 4px 0 0;
+  transform: rotate(90deg);
+  transform-origin: bottom right;
+  z-index: 1100;
+  width: 40px;
+  height: 40px;
+  display: flex !important; /* Force display */
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
   background-color: #007bff;
   color: white;
   border: none;
-  transition: right 0.3s ease-in-out;
+  transition: bottom 0.3s ease-in-out;
+  padding: 8px 12px;
+}
+
+/* Reset chat toggle styling to make it visible on all devices */
+.chat-toggle {
+  position: fixed;
+  z-index: 9999; /* Very high z-index to ensure visibility */
+  display: flex !important; /* Force display */
+  align-items: center;
+  justify-content: center;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  padding: 8px 12px;
+  width: 40px;
+  height: 40px;
+}
+
+/* Desktop styling for chat toggle */
+@media (min-width: 769px) {
+  .chat-toggle {
+    display: flex !important;
+    top: 10px;
+    right: 320px; /* Position it next to the sidebar */
+    border-radius: 4px 0 0 4px;
+    transform: none;
+  }
+  
+  .app-container.chat-hidden .chat-toggle {
+    right: 0;
+  }
+  
+  /* Hide the mobile chat toggle on desktop */
+  #mobile-chat-toggle {
+    display: none !important;
+  }
+}
+
+/* Mobile styling for chat toggle */
+@media (max-width: 768px) {
+  /* Hide the original chat toggle on mobile */
+  .chat-toggle {
+    display: none !important;
+  }
+  
+  /* Show the mobile chat toggle */
+  #mobile-chat-toggle {
+    display: flex !important; /* Change to flex to match other buttons */
+    background-color: #007bff;
+    color: white;
+    border: 1px solid #007bff;
+  }
+  
+  /* Show the mobile chat toggle */
+  #mobile-chat-toggle {
+    display: flex !important; /* Change to flex to match other buttons */
+    background-color: #007bff !important;
+    color: white !important;
+    border: 1px solid #007bff !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
+    font-size: 16px !important;
+  }
+  
+  /* Remove bottom padding to make canvas full height */
+  .canvas-container {
+    padding-bottom: 0 !important;
+    height: 100vh !important;
+  }
+  
+  /* Adjust bottom overlays positioning */
+  .overlay-bottom-right,
+  .overlay-bottom-left {
+    bottom: 20px !important; /* Closer to the bottom */
+  }
 }
 
 /* Update the chat hidden state */
 .app-container.chat-hidden .chat-sidebar {
   transform: translateX(100%); /* Move it off-screen to the right */
   width: 0; /* Ensure it takes no space when hidden */
-}
-
-.app-container.chat-hidden .chat-toggle {
-  right: 0; /* Move toggle button to the edge when chat is hidden */
 }
 
 .chat-message {
@@ -213,13 +307,12 @@ html {
   .chat-sidebar {
     width: 100%;
     height: 40vh;
-    border-left: none;
-    border-top: 1px solid #333;
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
     position: fixed;
     bottom: 0;
     right: 0;
-    transition: transform 0.3s ease-in-out;
+    border-top: 1px solid #333;
+    border-left: none;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
   }
   
   /* Adjust chat toggle position for mobile */
@@ -267,6 +360,18 @@ html {
   input, button, .btn {
     min-height: 44px; /* Apple's recommended minimum touch target size */
   }
+  
+  /* Adjust bottom overlays to be above the mobile navigation bar */
+  .overlay-bottom-right,
+  .overlay-bottom-left {
+    bottom: 90px;
+  }
+  
+  /* Fix the help button position */
+  .canvas-container .d-block.d-md-none .btn-info {
+    bottom: 90px !important;
+    z-index: 1050;
+  }
 }
 
 /* Adjust for very small screens */
@@ -300,6 +405,17 @@ html {
   .chat-toggle {
     bottom: 50vh;
   }
+  
+  /* Add padding to bottom of canvas container for mobile navigation bar */
+  .canvas-container {
+    padding-bottom: 80px; /* Add padding to avoid mobile navigation bar overlap */
+  }
+  
+  /* Adjust bottom overlays to be above the mobile navigation bar */
+  .overlay-bottom-right,
+  .overlay-bottom-left {
+    bottom: 90px;
+  }
 }
 
 /* Ensure proper display in landscape mode */
@@ -315,5 +431,34 @@ html {
   /* Adjust modal positioning for landscape */
   .modal-dialog-centered {
     min-height: calc(100% - 20px);
+  }
+}
+
+/* Fix the help button position */
+.canvas-container .d-block.d-md-none .btn-info {
+  bottom: 90px !important;
+  z-index: 1050;
+}
+
+/* Fix the help button position */
+.mobile-help-btn {
+  bottom: 20px !important; /* Match other mobile buttons */
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  z-index: 1050;
+  width: 40px;
+  height: 40px;
+  font-size: 18px;
+  font-weight: bold;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Add padding only on mobile */
+@media (max-width: 768px) {
+  .canvas-container {
+    padding-bottom: 120px; /* Add padding to avoid mobile navigation bar overlap */
   }
 }

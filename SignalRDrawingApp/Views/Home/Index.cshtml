@@ -22,7 +22,7 @@
     </div>
 </div>
 
-<div class="app-container chat-hidden">
+<div class="app-container">
     <!-- Canvas Area -->
     <partial name="_CanvasPartial" />
     
@@ -115,12 +115,6 @@
             
             // Notify chat.js
             window.dispatchEvent(new CustomEvent('userNameSet', { detail: userName }));
-            
-            // On mobile, start with chat hidden
-            if (window.innerWidth <= 768) {
-                $('.app-container').addClass('chat-hidden');
-                $('#chat-toggle-icon').text('▲');
-            }
         } else {
             alert('Please enter your name');
         }

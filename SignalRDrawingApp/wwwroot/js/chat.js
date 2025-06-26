@@ -56,21 +56,47 @@ function appendMessage(user, message) {
 
 // Toggle chat sidebar visibility
 function toggleChat() {
+    console.log("Toggle chat called");
+    
     const appContainer = document.querySelector('.app-container');
     const chatToggleIcon = document.getElementById('chat-toggle-icon');
+    const chatToggleBtn = document.getElementById('chat-toggle');
+    const chatSidebar = document.getElementById('global-chat');
     const isMobile = window.innerWidth <= 768;
+    
+    if (!appContainer || !chatToggleIcon) {
+        console.error("Required elements not found");
+        return;
+    }
+    
+    console.log("Current chat visible state:", chatVisible);
     
     if (chatVisible) {
         // Hide chat
         appContainer.classList.add('chat-hidden');
         chatToggleIcon.textContent = isMobile ? '▲' : '❯';
+        console.log("Hiding chat");
     } else {
         // Show chat
         appContainer.classList.remove('chat-hidden');
         chatToggleIcon.textContent = isMobile ? '▼' : '❮';
+        console.log("Showing chat");
     }
     
     chatVisible = !chatVisible;
+    console.log("New chat visible state:", chatVisible);
+    
+    // Ensure toggle button is visible
+    if (chatToggleBtn) {
+        chatToggleBtn.style.display = 'flex';
+        chatToggleBtn.style.visibility = 'visible';
+        chatToggleBtn.style.opacity = '1';
+    }
+    
+    // Ensure chat sidebar has proper styling
+    if (chatSidebar) {
+        chatSidebar.style.display = 'flex';
+    }
     
     // Force a redraw of the canvas to ensure it fills the available space
     setTimeout(() => {
@@ -179,6 +205,22 @@ document.addEventListener('DOMContentLoaded', function () {
     const chatToggleBtn = document.getElementById('chat-toggle');
     if (chatToggleBtn) {
         chatToggleBtn.addEventListener('click', toggleChat);
+        
+        // Ensure the toggle button is visible
+        chatToggleBtn.style.display = 'flex';
+        
+        // Set the correct icon based on screen size and visibility state
+        const isMobile = window.innerWidth <= 768;
+        const chatToggleIcon = document.getElementById('chat-toggle-icon');
+        if (chatToggleIcon) {
+            chatToggleIcon.textContent = isMobile ? '▲' : '❮';
+        }
+    }
+    
+    // Set up mobile chat toggle button
+    const mobileChatToggleBtn = document.getElementById('mobile-chat-toggle');
+    if (mobileChatToggleBtn) {
+        mobileChatToggleBtn.addEventListener('click', toggleChat);
     }
     
     // Add a share position button to the chat input
@@ -197,4 +239,49 @@ document.addEventListener('DOMContentLoaded', function () {
             chatForm.appendChild(sharePositionBtn);
         }
     }
+    
+    // Fix for mobile devices - ensure chat toggle is visible
+    setTimeout(function() {
+        const chatToggleBtn = document.getElementById('chat-toggle');
+        if (chatToggleBtn) {
+            chatToggleBtn.style.display = 'flex';
+        }
+    }, 1000);
+});
+
+// Ensure chat and toggle are visible on page load
+document.addEventListener('DOMContentLoaded', function() {
+    // Show chat toggle immediately
+    const chatToggleBtn = document.getElementById('chat-toggle');
+    if (chatToggleBtn) {
+        chatToggleBtn.style.display = 'flex';
+        chatToggleBtn.style.visibility = 'visible';
+        chatToggleBtn.style.opacity = '1';
+    }
+    
+    // Make sure chat is properly initialized
+    const appContainer = document.querySelector('.app-container');
+    const isMobile = window.innerWidth <= 768;
+    
+    // Set initial chat state
+    if (appContainer) {
+        if (isMobile) {
+            // Start with chat hidden on mobile
+            appContainer.classList.add('chat-hidden');
+            if (chatToggleBtn && document.getElementById('chat-toggle-icon')) {
+                document.getElementById('chat-toggle-icon').textContent = '▲';
+            }
+        } else {
+            // Start with chat visible on desktop
+            appContainer.classList.remove('chat-hidden');
+            if (chatToggleBtn && document.getElementById('chat-toggle-icon')) {
+                document.getElementById('chat-toggle-icon').textContent = '❮';
+            }
+        }
+    }
+    
+    // Force redraw after a short delay
+    setTimeout(function() {
+        window.dispatchEvent(new Event('resize'));
+    }, 500);
 });
