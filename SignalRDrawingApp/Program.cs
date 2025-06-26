@@ -57,6 +57,12 @@ app.UseSession();
 
 app.UseAuthorization();
 
+// Special route for /admin -> redirect to login if not authenticated
+app.MapControllerRoute(
+    name: "admin_redirect",
+    pattern: "admin",
+    defaults: new { controller = "Admin", action = "Index" });
+
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
