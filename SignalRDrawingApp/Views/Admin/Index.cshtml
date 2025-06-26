@@ -1,0 +1,245 @@
+@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<!-- Small boxes (Stat box) -->
+<div class="row">
+    <div class="col-lg-3 col-6">
+        <!-- small box -->
+        <div class="small-box bg-info">
+            <div class="inner">
+                <h3 id="total-sessions">@ViewBag.TotalSessions</h3>
+                <p>Drawing Sessions</p>
+            </div>
+            <div class="icon">
+                <i class="fas fa-users"></i>
+            </div>
+            <a href="/Admin/Sessions" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+        </div>
+    </div>
+    <!-- ./col -->
+    <div class="col-lg-3 col-6">
+        <!-- small box -->
+        <div class="small-box bg-success">
+            <div class="inner">
+                <h3 id="total-strokes">@ViewBag.TotalStrokes</h3>
+                <p>Drawing Strokes</p>
+            </div>
+            <div class="icon">
+                <i class="fas fa-paint-brush"></i>
+            </div>
+            <a href="#" class="small-box-footer">Total Lines Drawn <i class="fas fa-arrow-circle-right"></i></a>
+        </div>
+    </div>
+    <!-- ./col -->
+    <div class="col-lg-3 col-6">
+        <!-- small box -->
+        <div class="small-box bg-warning">
+            <div class="inner">
+                <h3 id="total-messages">@ViewBag.TotalChatMessages</h3>
+                <p>Chat Messages</p>
+            </div>
+            <div class="icon">
+                <i class="fas fa-comments"></i>
+            </div>
+            <a href="/Admin/ChatMessages" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+        </div>
+    </div>
+    <!-- ./col -->
+    <div class="col-lg-3 col-6">
+        <!-- small box -->
+        <div class="small-box bg-danger">
+            <div class="inner">
+                <h3 id="connected-users">@ViewBag.ConnectedUsers</h3>
+                <p>Connected Users</p>
+            </div>
+            <div class="icon">
+                <i class="fas fa-wifi"></i>
+            </div>
+            <a href="#" class="small-box-footer">Real-time <i class="fas fa-arrow-circle-right"></i></a>
+        </div>
+    </div>
+    <!-- ./col -->
+</div>
+<!-- /.row -->
+
+<!-- Main row -->
+<div class="row">
+    <!-- Left col -->
+    <section class="col-lg-7 connectedSortable">
+        <!-- Recent Activity -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-chart-bar mr-1"></i>
+                    Activity Overview
+                </h3>
+                <div class="card-tools">
+                    <button type="button" class="btn btn-sm btn-tool" data-card-widget="collapse">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <canvas id="activityChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+        <!-- /.card -->
+
+        <!-- Quick Actions -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-tools mr-1"></i>
+                    Quick Actions
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <a href="/Admin/Sessions" class="btn btn-primary btn-block">
+                            <i class="fas fa-users"></i> Manage Sessions
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <a href="/Admin/ChatMessages" class="btn btn-info btn-block">
+                            <i class="fas fa-comments"></i> View Chat Messages
+                        </a>
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-md-6">
+                        <a href="/" class="btn btn-success btn-block">
+                            <i class="fas fa-paint-brush"></i> Go to Drawing App
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <button class="btn btn-warning btn-block" onclick="refreshStats()">
+                            <i class="fas fa-sync-alt"></i> Refresh Data
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /.card -->
+    </section>
+    <!-- /.Left col -->
+
+    <!-- Right col (fixed) -->
+    <section class="col-lg-5 connectedSortable">
+        <!-- System Info -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    System Information
+                </h3>
+                <div class="card-tools">
+                    <button type="button" class="btn btn-sm btn-tool" data-card-widget="collapse">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <tr>
+                            <td><strong>Server Time:</strong></td>
+                            <td id="server-time">@DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Total Sessions:</strong></td>
+                            <td>@ViewBag.TotalSessions</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Total Strokes:</strong></td>
+                            <td>@ViewBag.TotalStrokes</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Total Messages:</strong></td>
+                            <td>@ViewBag.TotalChatMessages</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Status:</strong></td>
+                            <td><span class="badge badge-success">Online</span></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <!-- /.card -->
+
+        <!-- Real-time Monitor -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-signal mr-1"></i>
+                    Real-time Monitor
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="progress-group">
+                    Drawing Sessions
+                    <span class="float-right"><b id="sessions-count">@ViewBag.TotalSessions</b>/100</span>
+                    <div class="progress progress-sm">
+                        <div class="progress-bar bg-primary" style="width: @(Math.Min(ViewBag.TotalSessions * 10, 100))%"></div>
+                    </div>
+                </div>
+                
+                <div class="progress-group">
+                    Chat Activity
+                    <span class="float-right"><b id="messages-count">@ViewBag.TotalChatMessages</b>/1000</span>
+                    <div class="progress progress-sm">
+                        <div class="progress-bar bg-warning" style="width: @(Math.Min(ViewBag.TotalChatMessages / 10, 100))%"></div>
+                    </div>
+                </div>
+                
+                <div class="progress-group">
+                    Drawing Activity
+                    <span class="float-right"><b id="strokes-count">@ViewBag.TotalStrokes</b>/5000</span>
+                    <div class="progress progress-sm">
+                        <div class="progress-bar bg-success" style="width: @(Math.Min(ViewBag.TotalStrokes / 50, 100))%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /.card -->
+    </section>
+    <!-- /.Right col -->
+</div>
+<!-- /.row (main row) -->
+
+@section Scripts {
+<script>
+    // Initialize activity chart
+    var ctx = document.getElementById('activityChart').getContext('2d');
+    var activityChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Sessions', 'Strokes', 'Messages', 'Users'],
+            datasets: [{
+                label: 'Activity Data',
+                data: [@ViewBag.TotalSessions, @ViewBag.TotalStrokes, @ViewBag.TotalChatMessages, @ViewBag.ConnectedUsers],
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 2,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // Update server time every second
+    setInterval(function() {
+        document.getElementById('server-time').textContent = new Date().toLocaleString();
+    }, 1000);
+</script>
+} 

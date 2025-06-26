@@ -1,0 +1,246 @@
+@model IEnumerable<SignalRDrawingApp.Models.ChatMessage>
+@{
+    ViewData["Title"] = "Chat Messages";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">All Chat Messages</h3>
+                <div class="card-tools">
+                    <div class="input-group input-group-sm" style="width: 150px;">
+                        <input type="text" id="searchMessages" class="form-control float-right" placeholder="Search">
+                        <div class="input-group-append">
+                            <button type="submit" class="btn btn-default">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body table-responsive p-0" style="height: 500px;">
+                @if (Model.Any())
+                {
+                    <table class="table table-head-fixed text-nowrap" id="messagesTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Username</th>
+                                <th>Message</th>
+                                <th>Session ID</th>
+                                <th>Created At</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var message in Model.OrderByDescending(m => m.CreatedAt))
+                            {
+                                <tr>
+                                    <td>@message.Id</td>
+                                    <td>
+                                        <span class="badge badge-primary">@message.Username</span>
+                                    </td>
+                                    <td style="max-width: 300px; word-wrap: break-word;">
+                                        @message.Message
+                                    </td>
+                                    <td>
+                                        <a href="/Admin/SessionDetails/@message.DrawingSessionId" class="badge badge-info">
+                                            Session @message.DrawingSessionId
+                                        </a>
+                                    </td>
+                                    <td>@message.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-danger" onclick="deleteMessage(@message.Id, '@Html.Raw(Html.Encode(message.Message))')">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <div class="text-center p-4">
+                        <i class="fas fa-comments fa-3x text-muted mb-3"></i>
+                        <h4 class="text-muted">No Chat Messages Found</h4>
+                        <p class="text-muted">There are currently no chat messages in the database.</p>
+                        <a href="/" class="btn btn-primary">
+                            <i class="fas fa-comment"></i> Start Chatting
+                        </a>
+                    </div>
+                }
+            </div>
+            <!-- /.card-body -->
+        </div>
+        <!-- /.card -->
+    </div>
+</div>
+
+<!-- Chat Statistics -->
+<div class="row">
+    <div class="col-md-3">
+        <div class="info-box">
+            <span class="info-box-icon bg-info"><i class="fas fa-comments"></i></span>
+            <div class="info-box-content">
+                <span class="info-box-text">Total Messages</span>
+                <span class="info-box-number">@Model.Count()</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="info-box">
+            <span class="info-box-icon bg-success"><i class="fas fa-users"></i></span>
+            <div class="info-box-content">
+                <span class="info-box-text">Unique Users</span>
+                <span class="info-box-number">@Model.Select(m => m.Username).Distinct().Count()</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="info-box">
+            <span class="info-box-icon bg-warning"><i class="fas fa-clock"></i></span>
+            <div class="info-box-content">
+                <span class="info-box-text">Latest Message</span>
+                <span class="info-box-number">
+                    @if (Model.Any())
+                    {
+                        @Model.OrderByDescending(m => m.CreatedAt).First().CreatedAt.ToString("MMM dd")
+                    }
+                    else
+                    {
+                        <text>None</text>
+                    }
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="info-box">
+            <span class="info-box-icon bg-danger"><i class="fas fa-database"></i></span>
+            <div class="info-box-content">
+                <span class="info-box-text">Sessions</span>
+                <span class="info-box-number">@Model.Select(m => m.DrawingSessionId).Distinct().Count()</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Most Active Users -->
+@if (Model.Any())
+{
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Most Active Users</h3>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        @foreach (var user in Model.GroupBy(m => m.Username)
+                                                   .OrderByDescending(g => g.Count())
+                                                   .Take(5)
+                                                   .Select(g => new { Username = g.Key, Count = g.Count() }))
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                @user.Username
+                                <span class="badge badge-primary badge-pill">@user.Count</span>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Recent Activity</h3>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        @foreach (var message in Model.OrderByDescending(m => m.CreatedAt).Take(5))
+                        {
+                            <li class="list-group-item">
+                                <strong>@message.Username</strong>: @(message.Message.Length > 50 ? message.Message.Substring(0, 50) + "..." : message.Message)
+                                <br>
+                                <small class="text-muted">@message.CreatedAt.ToString("MMM dd, HH:mm")</small>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Confirm Deletion</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this message?</p>
+                <blockquote class="blockquote">
+                    <p id="messageText" class="mb-0"></p>
+                </blockquote>
+                <p class="text-warning"><i class="fas fa-exclamation-triangle"></i> This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <form id="deleteForm" method="post" style="display: inline;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger">Delete Message</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    function deleteMessage(messageId, messageText) {
+        $('#messageText').text(messageText);
+        $('#deleteForm').attr('action', '/Admin/DeleteMessage/' + messageId);
+        $('#deleteModal').modal('show');
+    }
+
+    // Search functionality
+    document.getElementById('searchMessages').addEventListener('keyup', function() {
+        var input = this.value.toLowerCase();
+        var table = document.getElementById('messagesTable');
+        if (table) {
+            var rows = table.getElementsByTagName('tr');
+            
+            for (var i = 1; i < rows.length; i++) {
+                var row = rows[i];
+                var cells = row.getElementsByTagName('td');
+                var found = false;
+                
+                for (var j = 0; j < cells.length; j++) {
+                    if (cells[j].textContent.toLowerCase().indexOf(input) > -1) {
+                        found = true;
+                        break;
+                    }
+                }
+                
+                row.style.display = found ? '' : 'none';
+            }
+        }
+    });
+
+    // Auto-refresh messages every 30 seconds
+    setInterval(function() {
+        if (confirm('Refresh chat messages?')) {
+            location.reload();
+        }
+    }, 60000); // Every minute, with confirmation
+</script>
+} 

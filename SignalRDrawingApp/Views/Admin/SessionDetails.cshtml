@@ -1,0 +1,280 @@
+@model SignalRDrawingApp.Models.DrawingSession
+@{
+    ViewData["Title"] = $"Session Details - {Model.Name}";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var strokes = ViewBag.Strokes as IEnumerable<SignalRDrawingApp.Models.DrawingStroke>;
+    var messages = ViewBag.Messages as IEnumerable<SignalRDrawingApp.Models.ChatMessage>;
+}
+
+<!-- Session Information -->
+<div class="row">
+    <div class="col-md-6">
+        <div class="card card-primary">
+            <div class="card-header">
+                <h3 class="card-title">Session Information</h3>
+            </div>
+            <div class="card-body">
+                <table class="table table-striped">
+                    <tr>
+                        <th>Session ID:</th>
+                        <td>@Model.Id</td>
+                    </tr>
+                    <tr>
+                        <th>Name:</th>
+                        <td>@Model.Name</td>
+                    </tr>
+                    <tr>
+                        <th>Created At:</th>
+                        <td>@Model.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                    </tr>
+                    <tr>
+                        <th>Last Modified:</th>
+                        <td>@(Model.LastModifiedAt?.ToString("yyyy-MM-dd HH:mm:ss") ?? "Never")</td>
+                    </tr>
+                    <tr>
+                        <th>Background Color:</th>
+                        <td>
+                            <span class="badge" style="background-color: @Model.BackgroundColor; color: @(Model.BackgroundColor == "#FFFFFF" ? "#000" : "#fff"); padding: 5px 10px;">
+                                @Model.BackgroundColor
+                            </span>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card card-info">
+            <div class="card-header">
+                <h3 class="card-title">Statistics</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-6">
+                        <div class="description-block border-right">
+                            <span class="description-percentage text-success">
+                                <i class="fas fa-paint-brush"></i>
+                            </span>
+                            <h5 class="description-header">@(strokes?.Count() ?? 0)</h5>
+                            <span class="description-text">Drawing Strokes</span>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="description-block">
+                            <span class="description-percentage text-warning">
+                                <i class="fas fa-comments"></i>
+                            </span>
+                            <h5 class="description-header">@(messages?.Count() ?? 0)</h5>
+                            <span class="description-text">Chat Messages</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Actions -->
+<div class="row">
+    <div class="col-12">
+        <div class="card card-warning">
+            <div class="card-header">
+                <h3 class="card-title">Actions</h3>
+            </div>
+            <div class="card-body">
+                <div class="btn-group">
+                    <a href="/Admin/Sessions" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Sessions
+                    </a>
+                    <button class="btn btn-warning" onclick="clearChatMessages(@Model.Id)">
+                        <i class="fas fa-trash"></i> Clear Chat Messages
+                    </button>
+                    <button class="btn btn-danger" onclick="deleteSession(@Model.Id, '@Model.Name')">
+                        <i class="fas fa-trash-alt"></i> Delete Session
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Drawing Strokes -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Drawing Strokes (@(strokes?.Count() ?? 0))</h3>
+                <div class="card-tools">
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body table-responsive p-0" style="height: 300px;">
+                @if (strokes != null && strokes.Any())
+                {
+                    <table class="table table-head-fixed text-nowrap">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Stroke Data Preview</th>
+                                <th>Created At</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var stroke in strokes.OrderByDescending(s => s.CreatedAt))
+                            {
+                                <tr>
+                                    <td>@stroke.Id</td>
+                                    <td style="max-width: 400px; word-wrap: break-word; font-family: monospace; font-size: 11px;">
+                                        @(stroke.StrokeData.Length > 150 ? stroke.StrokeData.Substring(0, 150) + "..." : stroke.StrokeData)
+                                    </td>
+                                    <td>@stroke.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <div class="text-center p-4">
+                        <i class="fas fa-paint-brush fa-3x text-muted mb-3"></i>
+                        <h4 class="text-muted">No Drawing Strokes</h4>
+                        <p class="text-muted">This session has no drawing strokes yet.</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chat Messages -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Chat Messages (@(messages?.Count() ?? 0))</h3>
+                <div class="card-tools">
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body table-responsive p-0" style="height: 400px;">
+                @if (messages != null && messages.Any())
+                {
+                    <table class="table table-head-fixed text-nowrap">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Username</th>
+                                <th>Message</th>
+                                <th>Created At</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var message in messages.OrderByDescending(m => m.CreatedAt))
+                            {
+                                <tr>
+                                    <td>@message.Id</td>
+                                    <td>
+                                        <span class="badge badge-primary">@message.Username</span>
+                                    </td>
+                                    <td style="max-width: 400px; word-wrap: break-word;">
+                                        @message.Message
+                                    </td>
+                                    <td>@message.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <div class="text-center p-4">
+                        <i class="fas fa-comments fa-3x text-muted mb-3"></i>
+                        <h4 class="text-muted">No Chat Messages</h4>
+                        <p class="text-muted">This session has no chat messages yet.</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Session Modal -->
+<div class="modal fade" id="deleteSessionModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Confirm Session Deletion</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete the session "<span id="sessionName"></span>"?</p>
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle"></i> This will permanently delete:
+                    <ul>
+                        <li>@(strokes?.Count() ?? 0) drawing strokes</li>
+                        <li>@(messages?.Count() ?? 0) chat messages</li>
+                        <li>All session data</li>
+                    </ul>
+                    <strong>This action cannot be undone!</strong>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <form id="deleteSessionForm" method="post" style="display: inline;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger">Delete Session</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Clear Chat Messages Modal -->
+<div class="modal fade" id="clearChatModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Clear Chat Messages</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to clear all chat messages for this session?</p>
+                <p class="text-warning">
+                    <i class="fas fa-exclamation-triangle"></i> 
+                    This will delete @(messages?.Count() ?? 0) chat messages permanently.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <form id="clearChatForm" method="post" style="display: inline;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-warning">Clear Messages</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    function deleteSession(sessionId, sessionName) {
+        $('#sessionName').text(sessionName);
+        $('#deleteSessionForm').attr('action', '/Admin/DeleteSession/' + sessionId);
+        $('#deleteSessionModal').modal('show');
+    }
+
+    function clearChatMessages(sessionId) {
+        $('#clearChatForm').attr('action', '/Admin/ClearChatMessages/' + sessionId);
+        $('#clearChatModal').modal('show');
+    }
+</script>
+} 

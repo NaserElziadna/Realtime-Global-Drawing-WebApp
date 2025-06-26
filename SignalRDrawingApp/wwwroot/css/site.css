@@ -4,6 +4,36 @@ body {
   overflow: hidden;
 }
 
+/* User info bar */
+.user-info-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(135deg, #007bff, #0056b3);
+  color: white;
+  z-index: 1050;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.user-info-bar .btn {
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
+}
+
+.user-info-bar .btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-1px);
+}
+
+/* Adjust app container when user info bar is visible */
+body:has(.user-info-bar:not(.d-none)) .app-container {
+  margin-top: 50px;
+  height: calc(100vh - 50px);
+}
+
 /* App container layout */
 .app-container {
   display: flex;

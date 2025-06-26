@@ -22,13 +22,30 @@
     </div>
 </div>
 
-<div class="app-container">
-    <!-- Canvas Area -->
-    <partial name="_CanvasPartial" />
-    
-    <!-- Chat Sidebar -->
-    <partial name="_ChatPartial" />
-</div>
+    <!-- User Info Bar -->
+    <div class="user-info-bar d-none" id="userInfoBar">
+        <div class="container-fluid">
+            <div class="d-flex justify-content-between align-items-center py-2">
+                <span>Welcome, <strong id="currentUserName"></strong></span>
+                <div>
+                    <a href="/Admin" class="btn btn-sm btn-outline-secondary mr-2">
+                        <i class="fas fa-cog"></i> Admin Panel
+                    </a>
+                    <button class="btn btn-sm btn-outline-danger" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-container">
+        <!-- Canvas Area -->
+        <partial name="_CanvasPartial" />
+        
+        <!-- Chat Sidebar -->
+        <partial name="_ChatPartial" />
+    </div>
 
 <!-- File Saved Modal -->
 <div class="modal fade" id="file-saved-modal" tabindex="-1" aria-hidden="true">
@@ -91,9 +108,55 @@
 </div>
 
 <script>
+    // Function to get cookie value
+    function getCookie(name) {
+        var nameEQ = name + "=";
+        var ca = document.cookie.split(';');
+        for(var i=0;i < ca.length;i++) {
+            var c = ca[i];
+            while (c.charAt(0)==' ') c = c.substring(1,c.length);
+            if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+        }
+        return null;
+    }
+
+    // Function to show user info
+    function showUserInfo(userName) {
+        $('#currentUserName').text(userName);
+        $('#userInfoBar').removeClass('d-none');
+    }
+
+    // Function to logout
+    function logout() {
+        if (confirm('Are you sure you want to logout?')) {
+            // Clear local storage and cookies
+            localStorage.removeItem('userName');
+            window.userName = '';
+            
+            // Post to server to clear session
+            $.post('/Home/Logout', function() {
+                location.reload();
+            });
+        }
+    }
+
     // Show the login modal on page load
     $(document).ready(function () {
-        $('#loginModal').modal('show');
+        // Check for existing session/cookie
+        var existingUserName = getCookie('UserName') || '@ViewBag.UserName' || localStorage.getItem('userName');
+        
+        if (existingUserName && existingUserName !== '' && existingUserName !== 'null') {
+            // User already has a name, skip modal
+            window.userName = existingUserName;
+            showUserInfo(existingUserName);
+            connection.invoke('JoinRoom', existingUserName);
+            
+            // Notify chat.js
+            window.dispatchEvent(new CustomEvent('userNameSet', { detail: existingUserName }));
+        } else {
+            // Show login modal
+            $('#loginModal').modal('show');
+        }
         
         // Handle Enter key in username field
         $('#userName').keypress(function(e) {
@@ -109,12 +172,19 @@
         var userName = $('#userName').val().trim();
         if (userName) {
             window.userName = userName;
-            localStorage.setItem('userName', userName);
-            connection.invoke('JoinRoom', userName);
-            $('#loginModal').modal('hide');
             
-            // Notify chat.js
-            window.dispatchEvent(new CustomEvent('userNameSet', { detail: userName }));
+            // Save to session and cookie via server
+            $.post('/Home/SetUserName', { userName: userName }, function() {
+                localStorage.setItem('userName', userName);
+                connection.invoke('JoinRoom', userName);
+                $('#loginModal').modal('hide');
+                
+                // Show user info
+                showUserInfo(userName);
+                
+                // Notify chat.js
+                window.dispatchEvent(new CustomEvent('userNameSet', { detail: userName }));
+            });
         } else {
             alert('Please enter your name');
         }

@@ -116,5 +116,16 @@ namespace SignalRDrawingApp.Hubs
             }
             await base.OnDisconnectedAsync(exception);
         }
+
+        // Static methods for admin monitoring
+        public static int GetConnectedUsersCount()
+        {
+            return ConnectedUsers.Count;
+        }
+
+        public static List<string> GetConnectedUsersList()
+        {
+            return ConnectedUsers.Values.ToList();
+        }
     }
 }

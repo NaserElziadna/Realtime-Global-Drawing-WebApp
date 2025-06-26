@@ -1,0 +1,181 @@
+@model IEnumerable<SignalRDrawingApp.Models.DrawingSession>
+@{
+    ViewData["Title"] = "Drawing Sessions";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">All Drawing Sessions</h3>
+                <div class="card-tools">
+                    <div class="input-group input-group-sm" style="width: 150px;">
+                        <input type="text" id="searchSessions" class="form-control float-right" placeholder="Search">
+                        <div class="input-group-append">
+                            <button type="submit" class="btn btn-default">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body table-responsive p-0">
+                @if (Model.Any())
+                {
+                    <table class="table table-hover text-nowrap" id="sessionsTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Created At</th>
+                                <th>Last Modified</th>
+                                <th>Background Color</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var session in Model)
+                            {
+                                <tr>
+                                    <td>@session.Id</td>
+                                    <td>@session.Name</td>
+                                    <td>@session.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                                    <td>@(session.LastModifiedAt?.ToString("yyyy-MM-dd HH:mm:ss") ?? "Never")</td>
+                                    <td>
+                                        <span class="badge" style="background-color: @session.BackgroundColor; color: @(session.BackgroundColor == "#FFFFFF" ? "#000" : "#fff");">
+                                            @session.BackgroundColor
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <a href="/Admin/SessionDetails/@session.Id" class="btn btn-sm btn-info">
+                                                <i class="fas fa-eye"></i> View
+                                            </a>
+                                            <button class="btn btn-sm btn-danger" onclick="deleteSession(@session.Id, '@session.Name')">
+                                                <i class="fas fa-trash"></i> Delete
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <div class="text-center p-4">
+                        <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                        <h4 class="text-muted">No Drawing Sessions Found</h4>
+                        <p class="text-muted">There are currently no drawing sessions in the database.</p>
+                        <a href="/" class="btn btn-primary">
+                            <i class="fas fa-paint-brush"></i> Start Drawing
+                        </a>
+                    </div>
+                }
+            </div>
+            <!-- /.card-body -->
+        </div>
+        <!-- /.card -->
+    </div>
+</div>
+
+<!-- Session Statistics -->
+<div class="row">
+    <div class="col-md-4">
+        <div class="info-box">
+            <span class="info-box-icon bg-info"><i class="fas fa-chart-bar"></i></span>
+            <div class="info-box-content">
+                <span class="info-box-text">Total Sessions</span>
+                <span class="info-box-number">@Model.Count()</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="info-box">
+            <span class="info-box-icon bg-success"><i class="fas fa-clock"></i></span>
+            <div class="info-box-content">
+                <span class="info-box-text">Latest Session</span>
+                <span class="info-box-number">
+                    @if (Model.Any())
+                    {
+                        @Model.OrderByDescending(s => s.CreatedAt).First().CreatedAt.ToString("MMM dd")
+                    }
+                    else
+                    {
+                        <text>None</text>
+                    }
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="info-box">
+            <span class="info-box-icon bg-warning"><i class="fas fa-edit"></i></span>
+            <div class="info-box-content">
+                <span class="info-box-text">Modified Sessions</span>
+                <span class="info-box-number">@Model.Count(s => s.LastModifiedAt != null)</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Confirm Deletion</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete the session "<span id="sessionName"></span>"?</p>
+                <p class="text-warning"><i class="fas fa-exclamation-triangle"></i> This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <form id="deleteForm" method="post" style="display: inline;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger">Delete Session</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    function deleteSession(sessionId, sessionName) {
+        $('#sessionName').text(sessionName);
+        $('#deleteForm').attr('action', '/Admin/DeleteSession/' + sessionId);
+        $('#deleteModal').modal('show');
+    }
+
+    // Search functionality
+    document.getElementById('searchSessions').addEventListener('keyup', function() {
+        var input = this.value.toLowerCase();
+        var table = document.getElementById('sessionsTable');
+        if (table) {
+            var rows = table.getElementsByTagName('tr');
+            
+            for (var i = 1; i < rows.length; i++) {
+                var row = rows[i];
+                var cells = row.getElementsByTagName('td');
+                var found = false;
+                
+                for (var j = 0; j < cells.length; j++) {
+                    if (cells[j].textContent.toLowerCase().indexOf(input) > -1) {
+                        found = true;
+                        break;
+                    }
+                }
+                
+                row.style.display = found ? '' : 'none';
+            }
+        }
+    });
+</script>
+} 
