@@ -1,0 +1,108 @@
+@model SignalRDrawingApp.ViewModels.ProfileViewModel
+
+@{
+    ViewData["Title"] = "Profile";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white text-center">
+                    <h3 class="mb-0">
+                        <i class="fas fa-user-circle me-2"></i>
+                        My Profile
+                    </h3>
+                </div>
+                <div class="card-body p-4">
+                    @if (!string.IsNullOrEmpty(ViewData["StatusMessage"] as string))
+                    {
+                        <div class="alert alert-success alert-dismissible fade show">
+                            <i class="fas fa-check-circle me-2"></i>
+                            @ViewData["StatusMessage"]
+                            <button type="button" class="close" data-dismiss="alert">
+                                <span>&times;</span>
+                            </button>
+                        </div>
+                    }
+                    
+                    <form asp-action="Profile" method="post" novalidate>
+                        <div asp-validation-summary="All" class="text-danger mb-3"></div>
+                        
+                        <div class="form-group">
+                            <label asp-for="Email" class="form-label">
+                                <i class="fas fa-envelope me-2 text-primary"></i>Email Address
+                            </label>
+                            <input asp-for="Email" class="form-control form-control-lg" readonly />
+                            <small class="form-text text-muted">Email cannot be changed</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label asp-for="Nickname" class="form-label">
+                                <i class="fas fa-user me-2 text-primary"></i>Nickname
+                            </label>
+                            <input asp-for="Nickname" class="form-control form-control-lg" placeholder="Your display name" />
+                            <span asp-validation-for="Nickname" class="text-danger"></span>
+                            <small class="form-text text-muted">This is how others will see you in the chat</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label asp-for="PreferredColor" class="form-label">
+                                <i class="fas fa-palette me-2 text-primary"></i>Preferred Drawing Color
+                            </label>
+                            <div class="input-group">
+                                <input asp-for="PreferredColor" type="color" class="form-control form-control-color" />
+                                <input asp-for="PreferredColor" type="text" class="form-control" placeholder="#007bff" />
+                            </div>
+                            <span asp-validation-for="PreferredColor" class="text-danger"></span>
+                            <small class="form-text text-muted">Your default drawing color on the canvas</small>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-save me-2"></i>Update Profile
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer text-center">
+                    <div class="btn-group">
+                        <a href="/" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-1"></i>Back to Canvas
+                        </a>
+                        <form asp-action="Logout" asp-controller="Account" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-outline-danger" 
+                                    onclick="return confirm('Are you sure you want to logout?')">
+                                <i class="fas fa-sign-out-alt me-1"></i>Logout
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.card {
+    border-radius: 15px;
+    border: none;
+}
+
+.card-header {
+    border-radius: 15px 15px 0 0 !important;
+}
+
+.form-control-lg {
+    border-radius: 10px;
+}
+
+.form-control-color {
+    width: 60px;
+    border-radius: 10px 0 0 10px;
+}
+
+.btn-lg {
+    border-radius: 25px;
+}
+</style> 

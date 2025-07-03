@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SignalRDrawingApp.Data.UnitOfWork;
 using SignalRDrawingApp.Models;
@@ -6,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace SignalRDrawingApp.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class AdminController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
@@ -15,25 +17,8 @@ namespace SignalRDrawingApp.Controllers
             _unitOfWork = unitOfWork;
         }
 
-        private IActionResult CheckAuthentication()
-        {
-            if (!AdminLoginController.IsAdminAuthenticated(HttpContext))
-            {
-                return Redirect("/AdminLogin");
-            }
-            return null;
-        }
-
-
-
         public async Task<IActionResult> Index()
         {
-            // Check if user is authenticated, if not redirect to login
-            if (!AdminLoginController.IsAdminAuthenticated(HttpContext))
-            {
-                return Redirect("/AdminLogin");
-            }
-
             // Get statistics for the dashboard
             var sessions = await _unitOfWork.DrawingSessions.GetAllAsync();
             var totalSessions = sessions.Count();
@@ -60,18 +45,12 @@ namespace SignalRDrawingApp.Controllers
 
         public async Task<IActionResult> Sessions()
         {
-            var authResult = CheckAuthentication();
-            if (authResult != null) return authResult;
-
             var sessions = await _unitOfWork.DrawingSessions.GetAllAsync();
             return View(sessions);
         }
 
         public async Task<IActionResult> SessionDetails(int id)
         {
-            var authResult = CheckAuthentication();
-            if (authResult != null) return authResult;
-
             var session = await _unitOfWork.DrawingSessions.GetByIdAsync(id);
             if (session == null)
             {
@@ -89,9 +68,6 @@ namespace SignalRDrawingApp.Controllers
 
         public async Task<IActionResult> ChatMessages()
         {
-            var authResult = CheckAuthentication();
-            if (authResult != null) return authResult;
-
             var allMessages = await _unitOfWork.ChatMessages.GetAllAsync();
             return View(allMessages);
         }
@@ -99,9 +75,6 @@ namespace SignalRDrawingApp.Controllers
         [HttpPost]
         public async Task<IActionResult> DeleteSession(int id)
         {
-            var authResult = CheckAuthentication();
-            if (authResult != null) return authResult;
-
             var session = await _unitOfWork.DrawingSessions.GetByIdAsync(id);
             if (session != null)
             {
@@ -114,9 +87,6 @@ namespace SignalRDrawingApp.Controllers
         [HttpPost]
         public async Task<IActionResult> ClearChatMessages(int sessionId)
         {
-            var authResult = CheckAuthentication();
-            if (authResult != null) return authResult;
-
             var messages = await _unitOfWork.ChatMessages.GetBySessionIdAsync(sessionId);
             foreach (var message in messages)
             {
@@ -130,9 +100,6 @@ namespace SignalRDrawingApp.Controllers
         [HttpPost]
         public async Task<IActionResult> DeleteMessage(int id)
         {
-            var authResult = CheckAuthentication();
-            if (authResult != null) return authResult;
-
             var message = await _unitOfWork.ChatMessages.GetByIdAsync(id);
             if (message != null)
             {
@@ -146,9 +113,6 @@ namespace SignalRDrawingApp.Controllers
         [HttpGet]
         public async Task<IActionResult> GetStats()
         {
-            var authResult = CheckAuthentication();
-            if (authResult != null) return Json(new { error = "Unauthorized" });
-
             var sessions = await _unitOfWork.DrawingSessions.GetAllAsync();
             var totalSessions = sessions.Count();
             

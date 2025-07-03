@@ -49,18 +49,18 @@ namespace SignalRDrawingApp.Controllers
                         await _userManager.UpdateAsync(user);
                     }
                     
-                    _logger.LogInformation("User logged in.");
+                    _logger.LogInformation("User logged in with email: {Email}", model.Email);
                     return RedirectToLocal(returnUrl);
                 }
                 
                 if (result.IsLockedOut)
                 {
-                    _logger.LogWarning("User account locked out.");
+                    _logger.LogWarning("User account locked out for email: {Email}", model.Email);
                     ModelState.AddModelError(string.Empty, "Account locked out.");
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                    ModelState.AddModelError(string.Empty, "Invalid email or password.");
                 }
             }
 
@@ -86,16 +86,16 @@ namespace SignalRDrawingApp.Controllers
                 {
                     UserName = model.Email,
                     Email = model.Email,
-                    DisplayName = model.DisplayName ?? model.Email.Split('@')[0]
+                    Nickname = model.Nickname
                 };
                 
                 var result = await _userManager.CreateAsync(user, model.Password);
                 
                 if (result.Succeeded)
                 {
-                    _logger.LogInformation("User created a new account with password.");
+                    _logger.LogInformation("User created a new account with email: {Email}", model.Email);
                     
-                    // Add user to "User" role
+                    // Add user to "User" role by default
                     await _userManager.AddToRoleAsync(user, "User");
                     
                     await _signInManager.SignInAsync(user, isPersistent: false);
@@ -116,7 +116,6 @@ namespace SignalRDrawingApp.Controllers
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
-            HttpContext.Session.Clear();
             _logger.LogInformation("User logged out.");
             return RedirectToAction(nameof(HomeController.Index), "Home");
         }
@@ -140,7 +139,7 @@ namespace SignalRDrawingApp.Controllers
             var model = new ProfileViewModel
             {
                 Email = user.Email!,
-                DisplayName = user.DisplayName ?? user.UserName!,
+                Nickname = user.Nickname,
                 PreferredColor = user.PreferredColor ?? "#007bff"
             };
 
@@ -163,7 +162,7 @@ namespace SignalRDrawingApp.Controllers
                 return NotFound();
             }
 
-            user.DisplayName = model.DisplayName;
+            user.Nickname = model.Nickname;
             user.PreferredColor = model.PreferredColor;
 
             var result = await _userManager.UpdateAsync(user);

@@ -9,9 +9,10 @@ namespace SignalRDrawingApp.ViewModels
         [Display(Name = "Email")]
         public string Email { get; set; } = string.Empty;
 
-        [StringLength(100)]
-        [Display(Name = "Display Name")]
-        public string? DisplayName { get; set; }
+        [Required]
+        [StringLength(50, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 2)]
+        [Display(Name = "Nickname")]
+        public string Nickname { get; set; } = string.Empty;
 
         [Required]
         [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]

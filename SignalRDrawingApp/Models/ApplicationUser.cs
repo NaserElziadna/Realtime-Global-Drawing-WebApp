@@ -5,8 +5,10 @@ namespace SignalRDrawingApp.Models
 {
     public class ApplicationUser : IdentityUser
     {
-        [StringLength(100)]
-        public string? DisplayName { get; set; }
+        [Required]
+        [StringLength(50)]
+        [Display(Name = "Nickname")]
+        public string Nickname { get; set; } = string.Empty;
         
         [StringLength(50)]
         public string? PreferredColor { get; set; } = "#007bff";

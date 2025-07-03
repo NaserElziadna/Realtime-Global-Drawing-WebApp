@@ -52,19 +52,11 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
 });
 
-// Add authorization policies
+// Add authorization policies for two roles only: User and Admin
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
-    options.AddPolicy("ModeratorOrAdmin", policy => policy.RequireRole("Moderator", "Admin"));
-});
-
-// Add session support
-builder.Services.AddSession(options =>
-{
-    options.IdleTimeout = TimeSpan.FromMinutes(30);
-    options.Cookie.HttpOnly = true;
-    options.Cookie.IsEssential = true;
+    options.AddPolicy("UserOrAdmin", policy => policy.RequireRole("User", "Admin"));
 });
 
 // Register UnitOfWork and repositories
@@ -91,9 +83,6 @@ app.UseRouting();
 // Add authentication and authorization middleware
 app.UseAuthentication();
 app.UseAuthorization();
-
-// Add session middleware
-app.UseSession();
 
 // Configure SignalR hubs
 app.MapHub<DrawingHub>("/drawingHub");
@@ -126,8 +115,8 @@ static async Task SeedRolesAndAdminUser(IServiceProvider serviceProvider)
     var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
     var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 
-    // Create roles
-    string[] roleNames = { "Admin", "Moderator", "User" };
+    // Create only two roles: User and Admin
+    string[] roleNames = { "Admin", "User" };
     foreach (var roleName in roleNames)
     {
         if (!await roleManager.RoleExistsAsync(roleName))
@@ -144,9 +133,9 @@ static async Task SeedRolesAndAdminUser(IServiceProvider serviceProvider)
     {
         adminUser = new ApplicationUser
         {
-            UserName = "admin",
+            UserName = adminEmail,
             Email = adminEmail,
-            DisplayName = "Administrator",
+            Nickname = "Administrator",
             EmailConfirmed = true,
             IsActive = true
         };

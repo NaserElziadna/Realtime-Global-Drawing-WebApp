@@ -79,7 +79,7 @@ namespace SignalRDrawingApp.Data
             // Configure ApplicationUser
             modelBuilder.Entity<ApplicationUser>(entity =>
             {
-                entity.Property(e => e.DisplayName).HasMaxLength(100);
+                //entity.Property(e => e.DisplayName).HasMaxLength(100);
                 entity.Property(e => e.PreferredColor).HasMaxLength(50).HasDefaultValue("#007bff");
                 entity.Property(e => e.IsActive).HasDefaultValue(true);
             });

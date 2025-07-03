@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using SignalRDrawingApp.Models;
 using System.Diagnostics;
@@ -7,15 +8,28 @@ namespace SignalRDrawingApp.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, UserManager<ApplicationUser> userManager)
         {
             _logger = logger;
+            _userManager = userManager;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            ViewBag.UserName = HttpContext.Session.GetString("UserName");
+            if (User.Identity?.IsAuthenticated == true)
+            {
+                var user = await _userManager.GetUserAsync(User);
+                ViewBag.UserName = user?.Nickname ?? "Anonymous";
+                ViewBag.IsAuthenticated = true;
+            }
+            else
+            {
+                ViewBag.UserName = null;
+                ViewBag.IsAuthenticated = false;
+            }
+            
             return View();
         }
 
