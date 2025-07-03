@@ -114,6 +114,7 @@ static async Task SeedRolesAndAdminUser(IServiceProvider serviceProvider)
 {
     var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
     var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+    var logger = serviceProvider.GetRequiredService<ILogger<Program>>();
 
     // Create only two roles: User and Admin
     string[] roleNames = { "Admin", "User" };
@@ -121,7 +122,19 @@ static async Task SeedRolesAndAdminUser(IServiceProvider serviceProvider)
     {
         if (!await roleManager.RoleExistsAsync(roleName))
         {
-            await roleManager.CreateAsync(new IdentityRole(roleName));
+            var roleResult = await roleManager.CreateAsync(new IdentityRole(roleName));
+            if (roleResult.Succeeded)
+            {
+                logger.LogInformation("Created role: {RoleName}", roleName);
+            }
+            else
+            {
+                logger.LogError("Failed to create role {RoleName}: {Errors}", roleName, string.Join(", ", roleResult.Errors.Select(e => e.Description)));
+            }
+        }
+        else
+        {
+            logger.LogInformation("Role {RoleName} already exists", roleName);
         }
     }
 
@@ -131,6 +144,8 @@ static async Task SeedRolesAndAdminUser(IServiceProvider serviceProvider)
     
     if (adminUser == null)
     {
+        logger.LogInformation("Creating admin user with email: {Email}", adminEmail);
+        
         adminUser = new ApplicationUser
         {
             UserName = adminEmail,
@@ -143,7 +158,53 @@ static async Task SeedRolesAndAdminUser(IServiceProvider serviceProvider)
         var result = await userManager.CreateAsync(adminUser, "admin123");
         if (result.Succeeded)
         {
+            logger.LogInformation("Admin user created successfully");
+            var roleResult = await userManager.AddToRoleAsync(adminUser, "Admin");
+            if (roleResult.Succeeded)
+            {
+                logger.LogInformation("Admin role assigned to admin user");
+            }
+            else
+            {
+                logger.LogError("Failed to assign Admin role: {Errors}", string.Join(", ", roleResult.Errors.Select(e => e.Description)));
+            }
+        }
+        else
+        {
+            logger.LogError("Failed to create admin user: {Errors}", string.Join(", ", result.Errors.Select(e => e.Description)));
+        }
+    }
+    else
+    {
+        logger.LogInformation("Admin user already exists with email: {Email}", adminEmail);
+        
+        // Ensure admin user is active and has correct properties
+        var needsUpdate = false;
+        if (!adminUser.IsActive)
+        {
+            adminUser.IsActive = true;
+            needsUpdate = true;
+            logger.LogInformation("Admin user was inactive, setting to active");
+        }
+        
+        if (!adminUser.EmailConfirmed)
+        {
+            adminUser.EmailConfirmed = true;
+            needsUpdate = true;
+            logger.LogInformation("Admin user email was not confirmed, setting to confirmed");
+        }
+        
+        if (needsUpdate)
+        {
+            await userManager.UpdateAsync(adminUser);
+            logger.LogInformation("Admin user updated");
+        }
+        
+        // Ensure admin user has Admin role
+        if (!await userManager.IsInRoleAsync(adminUser, "Admin"))
+        {
             await userManager.AddToRoleAsync(adminUser, "Admin");
+            logger.LogInformation("Admin role added to existing admin user");
         }
     }
 }

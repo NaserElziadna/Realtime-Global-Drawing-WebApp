@@ -37,17 +37,33 @@ namespace SignalRDrawingApp.Controllers
             
             if (ModelState.IsValid)
             {
+                // Debug: Check if user exists
+                var user = await _userManager.FindByEmailAsync(model.Email);
+                if (user == null)
+                {
+                    _logger.LogWarning("User not found with email: {Email}", model.Email);
+                    ModelState.AddModelError(string.Empty, "Invalid email or password.");
+                    return View(model);
+                }
+                
+                // Debug: Check if user is active
+                if (!user.IsActive)
+                {
+                    _logger.LogWarning("User account is inactive for email: {Email}", model.Email);
+                    ModelState.AddModelError(string.Empty, "Account is inactive.");
+                    return View(model);
+                }
+                
+                // Debug: Log sign-in attempt
+                _logger.LogInformation("Attempting sign-in for user: {Email}, UserName: {UserName}", model.Email, user.UserName);
+                
                 var result = await _signInManager.PasswordSignInAsync(
-                    model.Email, model.Password, model.RememberMe, lockoutOnFailure: true);
+                    user.UserName, model.Password, model.RememberMe, lockoutOnFailure: true);
                 
                 if (result.Succeeded)
                 {
-                    var user = await _userManager.FindByEmailAsync(model.Email);
-                    if (user != null)
-                    {
-                        user.LastLoginAt = DateTime.UtcNow;
-                        await _userManager.UpdateAsync(user);
-                    }
+                    user.LastLoginAt = DateTime.UtcNow;
+                    await _userManager.UpdateAsync(user);
                     
                     _logger.LogInformation("User logged in with email: {Email}", model.Email);
                     return RedirectToLocal(returnUrl);
@@ -58,10 +74,25 @@ namespace SignalRDrawingApp.Controllers
                     _logger.LogWarning("User account locked out for email: {Email}", model.Email);
                     ModelState.AddModelError(string.Empty, "Account locked out.");
                 }
+                else if (result.IsNotAllowed)
+                {
+                    _logger.LogWarning("User sign-in not allowed for email: {Email}", model.Email);
+                    ModelState.AddModelError(string.Empty, "Sign-in not allowed.");
+                }
+                else if (result.RequiresTwoFactor)
+                {
+                    _logger.LogWarning("User requires two-factor authentication for email: {Email}", model.Email);
+                    ModelState.AddModelError(string.Empty, "Two-factor authentication required.");
+                }
                 else
                 {
+                    _logger.LogWarning("Invalid password for email: {Email}", model.Email);
                     ModelState.AddModelError(string.Empty, "Invalid email or password.");
                 }
+            }
+            else
+            {
+                _logger.LogWarning("Model state invalid for login attempt with email: {Email}", model.Email);
             }
 
             return View(model);
