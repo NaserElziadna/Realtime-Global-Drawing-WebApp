@@ -91,10 +91,11 @@ canvas.addEventListener('wheel', (event) => {
     const unitsAddLeft = unitsZoomedX * distX;
     const unitsAddTop = unitsZoomedY * distY;
 
-    offsetX -= unitsAddLeft;
-    offsetY -= unitsAddTop;
+            offsetX -= unitsAddLeft;
+        offsetY -= unitsAddTop;
 
-    redraw();
+        redraw();
+        updateZoomDisplay();
 }, { passive: false })
 
 
@@ -159,6 +160,10 @@ function onTouchEnd(e) {
 
 }
 function onTouchMove(evt) {
+    // Update coordinate display for touch
+    if (evt.touches.length > 0) {
+        updateCoordinateDisplayTouch(evt.touches[0]);
+    }
 
     const touch1X = evt.touches[0].pageX;
     const touch1Y = evt.touches[0].pageY;
@@ -207,8 +212,8 @@ function onTouchMove(evt) {
         offsetX += unitsAddLeft;
         offsetY += unitsAddTop;
 
-
-        redraw()
+        redraw();
+        updateZoomDisplay();
     } else if (drawing) {
         if (currentStroke.length == 0) {
             // need to add the first touch
@@ -279,6 +284,9 @@ var currentStroke = [];
 function onMouseMove(evt) {
     cursorX = evt.pageX;
     cursorY = evt.pageY;
+
+    // Update coordinate display
+    updateCoordinateDisplay(evt);
 
     if (panning) {
         offsetX += (cursorX - cursorXprev) / scale;
@@ -734,4 +742,56 @@ function updateUserCount(count) {
 
 connection.on('updateUserCount', function (count) {
     updateUserCount(count);
+});
+
+// Coordinate display functions
+function updateCoordinateDisplay(evt) {
+    const rect = canvas.getBoundingClientRect();
+    const mouseX = Math.round(evt.clientX - rect.left);
+    const mouseY = Math.round(evt.clientY - rect.top);
+    
+    const canvasX = Math.round(toTrueX(evt.pageX));
+    const canvasY = Math.round(toTrueY(evt.pageY));
+    
+    const mouseCoords = document.getElementById('mouseCoords');
+    const canvasCoords = document.getElementById('canvasCoords');
+    
+    if (mouseCoords) {
+        mouseCoords.textContent = `${mouseX}, ${mouseY}`;
+    }
+    if (canvasCoords) {
+        canvasCoords.textContent = `${canvasX}, ${canvasY}`;
+    }
+}
+
+function updateCoordinateDisplayTouch(touch) {
+    const rect = canvas.getBoundingClientRect();
+    const touchX = Math.round(touch.clientX - rect.left);
+    const touchY = Math.round(touch.clientY - rect.top);
+    
+    const canvasX = Math.round(toTrueX(touch.pageX));
+    const canvasY = Math.round(toTrueY(touch.pageY));
+    
+    const mouseCoords = document.getElementById('mouseCoords');
+    const canvasCoords = document.getElementById('canvasCoords');
+    
+    if (mouseCoords) {
+        mouseCoords.textContent = `${touchX}, ${touchY}`;
+    }
+    if (canvasCoords) {
+        canvasCoords.textContent = `${canvasX}, ${canvasY}`;
+    }
+}
+
+function updateZoomDisplay() {
+    const zoomLevel = document.getElementById('zoomLevel');
+    if (zoomLevel) {
+        const zoomPercent = Math.round(scale * 100);
+        zoomLevel.textContent = `${zoomPercent}%`;
+    }
+}
+
+// Initialize zoom display on page load
+window.addEventListener('load', function() {
+    updateZoomDisplay();
 });

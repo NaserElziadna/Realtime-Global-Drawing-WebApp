@@ -1,6 +1,15 @@
 <div class="canvas-container">
     <canvas id="whiteboard">Sorry, your browser does not support HTML5 canvas technology.</canvas>
     
+    <!-- Coordinate Display -->
+    <div class="coordinate-display" id="coordinateDisplay">
+        <small>
+            <strong>Mouse:</strong> <span id="mouseCoords">0, 0</span> | 
+            <strong>Canvas:</strong> <span id="canvasCoords">0, 0</span> | 
+            <strong>Zoom:</strong> <span id="zoomLevel">100%</span>
+        </small>
+    </div>
+    
     <div class="btn-toolbar overlay-top-left d-flex flex-nowrap" role="toolbar">
         <div class="btn-group mr-2 shadow" role="group">
             <button type="button" class="btn btn-dark" onclick="setColour('#343a40')" aria-label="Black">&nbsp;</button>
