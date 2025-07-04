@@ -72,13 +72,18 @@ document.addEventListener('keyup', event => {
     if (event.key == "Control") ctrlDown = false;
 })
 
-document.addEventListener('wheel', (event) => {
+canvas.addEventListener('wheel', (event) => {
+    // Prevent default scroll behavior when interacting with canvas
+    event.preventDefault();
+    
     const deltaY = event.deltaY;
     const scaleAmount = -deltaY / 500;
     scale = scale * (1 + scaleAmount);
 
-    var distX = event.pageX / canvasWidth;
-    var distY = event.pageY / canvasHeight;
+    // Get mouse position relative to canvas
+    const rect = canvas.getBoundingClientRect();
+    var distX = (event.clientX - rect.left) / canvasWidth;
+    var distY = (event.clientY - rect.top) / canvasHeight;
 
     const unitsZoomedX = xUnitsScaled() * scaleAmount;
     const unitsZoomedY = yUnitsScaled() * scaleAmount;
@@ -90,7 +95,7 @@ document.addEventListener('wheel', (event) => {
     offsetY -= unitsAddTop;
 
     redraw();
-})
+}, { passive: false })
 
 
 // Mouse Event Handlers
